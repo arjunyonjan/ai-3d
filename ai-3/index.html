@@ -27,6 +27,25 @@ body{margin:0;overflow:hidden;background:radial-gradient(ellipse at center,#0a0a
 #math-panel .result{border-top:1px solid rgba(255,136,68,0.15);margin-top:6px;padding-top:6px;font-size:13px}
 #toggle-math{position:absolute;top:20px;right:20px;z-index:11;background:rgba(8,8,28,0.7);backdrop-filter:blur(8px);border:1px solid rgba(255,136,68,0.2);color:#ff8844;font-size:14px;padding:4px 10px;border-radius:4px;cursor:pointer;font-family:'JetBrains Mono',monospace;letter-spacing:1px}
 #math-panel.collapsed{display:none}
+
+/* Jarvis HUD */
+#jarvis-hud{position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:20;color:#4488ff;font-size:11px;letter-spacing:4px;text-transform:uppercase;text-shadow:0 0 20px rgba(68,136,255,0.4),0 0 60px rgba(68,136,255,0.1);pointer-events:none;font-weight:700}
+#jarvis-hud .cursor{display:inline-block;animation:blink 1s step-end infinite;color:#88ddff;margin-left:2px}
+@keyframes blink{50%{opacity:0}}
+.scanlines{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;background:repeating-linear-gradient(0deg,rgba(0,50,100,0.03) 0px,rgba(0,50,100,0.03) 1px,transparent 1px,transparent 3px);animation:scanMove 8s linear infinite}
+@keyframes scanMove{0%{background-position:0 0}100%{background-position:0 100px}}
+#corner-brackets{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:998}
+.cb{position:absolute;width:20px;height:20px;border-color:rgba(68,136,255,0.3);border-style:solid}
+.cb-tl{top:10px;left:10px;border-width:1px 0 0 1px}
+.cb-tr{top:10px;right:10px;border-width:1px 1px 0 0}
+.cb-bl{bottom:10px;left:10px;border-width:0 0 1px 1px}
+.cb-br{bottom:10px;right:10px;border-width:0 1px 1px 0}
+
+#controls{background:rgba(8,8,28,0.85);border:1px solid rgba(68,136,255,0.25);box-shadow:0 4px 40px rgba(0,0,0,0.6),0 0 30px rgba(68,136,255,0.06)}
+#controls label{color:#4488cc;letter-spacing:2px;font-size:10px;text-shadow:0 0 10px rgba(68,136,255,0.2)}
+#controls input[type=range]{background:linear-gradient(90deg,#004488,#4488ff);height:1px}
+#controls input[type=range]::-webkit-slider-thumb{width:10px;height:10px;background:#4488ff;border:1px solid #88ddff;box-shadow:0 0 15px rgba(68,136,255,0.6)}
+
 </style>
 </head>
 <body>
@@ -250,14 +269,17 @@ nodeGroup.add(hiddenNode);
 
 const reluLabel = makeLabel('ReLU', '#00ddcc', '#00ddcc', '9px');
 reluLabel.position.set(0, 0.45, 0);
+reluLabel.element.style.opacity = '0';
 nodeGroup.add(reluLabel);
 
-const hiddenLabel = makeLabel(`h = ${hiddenVal.toFixed(2)}`, '#00ddcc', '#00ddcc');
+const hiddenLabel = makeLabel('', '#00ddcc', '#00ddcc');
 hiddenLabel.position.set(0, 1.0, 0);
+hiddenLabel.element.style.opacity = '0';
 nodeGroup.add(hiddenLabel);
 
-const hiddenBiasLabel = makeLabel(`z₁=${(W1[0]*studyHrs+b1[0]+W1[1]*sleepHrs+b1[1]+W1[2]*pastGpa+b1[2]).toFixed(2)}`, '#4488aa', '#4488aa', '10px');
+const hiddenBiasLabel = makeLabel('', '#4488aa', '#4488aa', '10px');
 hiddenBiasLabel.position.set(0, -1.0, 0);
+hiddenBiasLabel.element.style.opacity = '0';
 nodeGroup.add(hiddenBiasLabel);
 
 // --- Output Layer (2 nodes) ---
@@ -405,9 +427,31 @@ function animate() {
   const fwd = forwardPass(studyHrs, sleepHrs, pastGpa);
   hiddenVal = fwd.h; engVal = fwd.eng; mathVal = fwd.math;
 
+  // Track segment transitions for hit pulses
+  if (window._nodePulse === undefined) window._nodePulse = [0, 0, 0];
+  const nodePulse = window._nodePulse;
+  for (let i = 0; i < 3; i++) nodePulse[i] = Math.max(0, nodePulse[i] - 0.025);
+  if (window._prevSeg === undefined) window._prevSeg = 0;
+  const currentSeg = rawPos < inputCurves.length ? 0 : 1;
+  if (currentSeg !== window._prevSeg) {
+    if (currentSeg === 1) nodePulse[0] = 1.0;
+    window._prevSeg = currentSeg;
+  }
+
   // Track which output nodes have been reached for persistent labels
   if (!window._outputRevealed) window._outputRevealed = [false, false];
   const revealed = window._outputRevealed;
+  if (window._hiddenRevealed === undefined) window._hiddenRevealed = false;
+
+  // Reveal hidden node labels when bolt arrives
+  if (rawPos >= inputCurves.length && !window._hiddenRevealed) {
+    window._hiddenRevealed = true;
+    hiddenLabel.element.textContent = `h = ${hiddenVal.toFixed(2)}`;
+    hiddenLabel.element.style.opacity = '';
+    hiddenBiasLabel.element.textContent = `z₁=${(W1[0]*studyHrs+b1[0]+W1[1]*sleepHrs+b1[1]+W1[2]*pastGpa+b1[2]).toFixed(2)}`;
+    hiddenBiasLabel.element.style.opacity = '';
+    reluLabel.element.style.opacity = '';
+  }
 
   let flowText = '';
   let boltStart, boltEnd;
@@ -429,6 +473,7 @@ function animate() {
       flowLabel.position.set(boltEnd.x, boltEnd.y + 0.5, boltEnd.z);
       if (t > 0.92) {
         flowText = idx === 0 ? engVal.toFixed(1) : mathVal.toFixed(1);
+        nodePulse[1 + idx] = 1.0;
         if (!revealed[idx]) {
           revealed[idx] = true;
           outputCSSLabels[idx].element.textContent = `${outputLabels[idx]}: ${(idx===0?engVal:mathVal).toFixed(1)}`;
@@ -468,23 +513,29 @@ function animate() {
   }
   flowLabel.element.textContent = flowText;
 
-  // Animate hidden node — wireframe rotates, ReLU gate colors
+  // Animate hidden node — wireframe rotates, ReLU gate colors, pulse on hit
   const reluActive = hiddenVal > 0;
   const reluColor = reluActive ? 0x00ddcc : 0xff3344;
   hiddenWire.material.color.setHex(reluColor);
   hiddenWire.material.opacity = reluActive ? 0.5 : 0.25;
   hiddenWire.rotation.x += 0.005;
   hiddenWire.rotation.y += 0.008;
+  const hp = nodePulse[0];
+  const hScale = 1 + hp * 0.35;
+  hiddenWire.scale.set(hScale, hScale, hScale);
+  hiddenCore.scale.setScalar(1 + hp * 0.6);
   hiddenCore.material.color.setHex(reluColor);
   reluLabel.element.style.color = reluActive ? '#00ddcc' : '#ff3344';
   reluLabel.element.style.borderColor = reluActive ? '#00ddcc' : '#ff3344';
 
-  // Animate output nodes
+  // Animate output nodes — pulse on hit
   outputNodes.forEach((grp, i) => {
     const dot = grp.children[0];
     const score = i === 0 ? engVal : mathVal;
     const hue = 0.3 + score * 0.003;
-    dot.material.color.setHSL(hue, 1, 0.6);
+    const op = nodePulse[1 + i];
+    dot.material.color.setHSL(hue, 1, 0.6 + op * 0.35);
+    dot.scale.setScalar(1 + op * 0.4);
   });
 
   // Update labels
@@ -492,8 +543,12 @@ function animate() {
     const val = i === 0 ? studyHrs.toFixed(1)+'h' : i === 1 ? sleepHrs.toFixed(1)+'h' : pastGpa.toFixed(1);
     lbl.element.textContent = `${inputLabels[i]} ${val}`;
   });
-  hiddenLabel.element.textContent = `h = ${hiddenVal.toFixed(2)}`;
-  hiddenBiasLabel.element.textContent = `z₁=${(W1[0]*studyHrs+b1[0]+W1[1]*sleepHrs+b1[1]+W1[2]*pastGpa+b1[2]).toFixed(2)}`;
+  if (hiddenLabel.element.style.opacity !== '0') {
+    hiddenLabel.element.textContent = `h = ${hiddenVal.toFixed(2)}`;
+  }
+  if (hiddenBiasLabel.element.style.opacity !== '0') {
+    hiddenBiasLabel.element.textContent = `z₁=${(W1[0]*studyHrs+b1[0]+W1[1]*sleepHrs+b1[1]+W1[2]*pastGpa+b1[2]).toFixed(2)}`;
+  }
   outputCSSLabels.forEach((lbl, i) => {
     if (lbl.element.style.opacity !== '0') {
       lbl.element.textContent = `${outputLabels[i]}: ${(i===0?engVal:mathVal).toFixed(1)}`;
