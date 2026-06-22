@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+body{margin:0;overflow:hidden;background:radial-gradient(ellipse at center,#0a0a1a 0%,#020208 100%);font-family:'JetBrains Mono',monospace}
+#info{position:absolute;top:20px;left:20px;color:#e0e0ff;background:rgba(8,8,28,0.75);backdrop-filter:blur(12px);padding:18px 22px;border-radius:8px;border:1px solid rgba(0,200,255,0.25);box-shadow:0 0 30px rgba(0,150,255,0.08),inset 0 0 60px rgba(0,100,255,0.03);z-index:10;max-width:360px}
+#info h2{color:#fff;margin:0;font-size:16px;letter-spacing:2px;text-transform:uppercase;text-shadow:0 0 20px rgba(0,200,255,0.3)}
+#info .formula{font-size:15px;color:#ff8844;margin:10px 0;padding:8px 12px;background:rgba(255,136,68,0.06);border-radius:4px;text-align:center;border:1px solid rgba(255,136,68,0.15);letter-spacing:1px}
+#info .highlight{color:#00ddff}
+#info .legend{font-size:11px;margin:2px 0;letter-spacing:0.5px;color:#8888aa}
+#info .legend span{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+#controls{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);background:rgba(8,8,28,0.8);backdrop-filter:blur(12px);padding:14px 32px;border-radius:8px;border:1px solid rgba(0,200,255,0.15);box-shadow:0 4px 40px rgba(0,0,0,0.5);z-index:10;display:flex;gap:32px}
+#controls .slider-group{display:flex;flex-direction:column;align-items:center;gap:6px}
+#controls label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#8888cc}
+#controls .slider-val{font-size:13px;color:#ccccee;letter-spacing:1px}
+#controls input[type=range]{-webkit-appearance:none;width:130px;height:2px;background:linear-gradient(90deg,#224488,#4488ff);outline:none;border-radius:2px;cursor:pointer}
+#controls input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:#4488ff;border:2px solid #88ccff;box-shadow:0 0 12px rgba(68,136,255,0.5);cursor:pointer}
+#controls input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#4488ff;border:2px solid #88ccff;cursor:pointer}
+#toggle-info{position:absolute;top:20px;left:20px;z-index:11;background:rgba(8,8,28,0.7);backdrop-filter:blur(8px);border:1px solid rgba(0,200,255,0.2);color:#4488ff;font-size:14px;padding:4px 10px;border-radius:4px;cursor:pointer;font-family:'JetBrains Mono',monospace;letter-spacing:1px}
+#info.collapsed{display:none}
+#math-panel{position:absolute;top:20px;right:20px;color:#e0e0ff;background:rgba(8,8,28,0.75);backdrop-filter:blur(12px);padding:14px 18px;border-radius:8px;border:1px solid rgba(255,136,68,0.2);box-shadow:0 0 30px rgba(255,136,68,0.06);z-index:10;max-width:380px;font-size:12px;line-height:1.6}
+#math-panel h3{color:#ff8844;margin:0 0 6px 0;font-size:13px;letter-spacing:1px;text-transform:uppercase}
+#math-panel .step{color:#8888bb;font-size:11px;letter-spacing:0.5px}
+#math-panel .val{color:#ccccee}
+#math-panel .highlight{color:#ff8844}
+#math-panel .result{border-top:1px solid rgba(255,136,68,0.15);margin-top:6px;padding-top:6px;font-size:13px}
+#toggle-math{position:absolute;top:20px;right:20px;z-index:11;background:rgba(8,8,28,0.7);backdrop-filter:blur(8px);border:1px solid rgba(255,136,68,0.2);color:#ff8844;font-size:14px;padding:4px 10px;border-radius:4px;cursor:pointer;font-family:'JetBrains Mono',monospace;letter-spacing:1px}
+#math-panel.collapsed{display:none}
+</style>
+</head>
+<body>
+<button id="toggle-info">⎔</button>
+<div id="info" class="collapsed">
+  <h2>▣ STUDENT NN · 3→1→2</h2>
+  <div class="formula">
+    score = ReLU(W₁·X + b₁)
+  </div>
+  <div class="legend">
+    <span style="background:#4488ff;box-shadow:0 0 6px #4488ff"></span> STUDY &nbsp;
+    <span style="background:#ff8800;box-shadow:0 0 6px #ff8800"></span> SLEEP &nbsp;
+    <span style="background:#aa44ff;box-shadow:0 0 6px #aa44ff"></span> PAST GPA &nbsp;
+    <span style="background:#00ddcc;box-shadow:0 0 6px #00ddcc"></span> HIDDEN &nbsp;
+    <span style="background:#44ff88;box-shadow:0 0 6px #44ff88"></span> ENG · MATH
+  </div>
+  <div id="stats" style="margin-top:10px;font-size:12px;color:#8888cc;border-top:1px solid rgba(0,200,255,0.1);padding-top:10px"></div>
+</div>
+
+<div id="controls">
+  <div class="slider-group">
+    <label>📚 Study</label>
+    <input type="range" id="studySlider" min="0" max="10" step="0.5" value="6">
+    <span class="slider-val" id="studyVal">6.0h</span>
+  </div>
+  <div class="slider-group">
+    <label>😴 Sleep</label>
+    <input type="range" id="sleepSlider" min="0" max="12" step="0.5" value="7">
+    <span class="slider-val" id="sleepVal">7.0h</span>
+  </div>
+  <div class="slider-group">
+    <label>📊 Past GPA</label>
+    <input type="range" id="gpaSlider" min="0" max="4" step="0.1" value="3.0">
+    <span class="slider-val" id="gpaVal">3.0</span>
+  </div>
+</div>
+
+<button id="toggle-math">∑</button>
+<div id="math-panel" class="collapsed">
+  <h3>▣ FORWARD PASS</h3>
+  <div id="math-content"></div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+document.getElementById('toggle-info').addEventListener('click', () => {
+  document.getElementById('info').classList.toggle('collapsed');
+});
+document.getElementById('toggle-math').addEventListener('click', () => {
+  document.getElementById('math-panel').classList.toggle('collapsed');
+});
+
+// --- Scene Setup ---
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x020208);
+
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 100);
+camera.position.set(12, 6, 16);
+camera.lookAt(0, 0, 0);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.2;
+document.body.appendChild(renderer.domElement);
+
+const labelRenderer = new CSS2DRenderer();
+labelRenderer.setSize(window.innerWidth, window.innerHeight);
+labelRenderer.domElement.style.position = 'absolute';
+labelRenderer.domElement.style.top = '0px';
+labelRenderer.domElement.style.left = '0px';
+labelRenderer.domElement.style.pointerEvents = 'none';
+document.body.appendChild(labelRenderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.target.set(0, 0, 0);
+
+// --- Lighting ---
+const ambient = new THREE.AmbientLight(0x222244, 0.6);
+scene.add(ambient);
+const hemi = new THREE.HemisphereLight(0x4488ff, 0x002244, 0.8);
+scene.add(hemi);
+const key = new THREE.DirectionalLight(0xffffff, 3);
+key.position.set(8, 12, 10);
+scene.add(key);
+const rim = new THREE.DirectionalLight(0x4488ff, 1.5);
+rim.position.set(-6, -2, -8);
+scene.add(rim);
+const fill = new THREE.DirectionalLight(0xff8844, 0.6);
+fill.position.set(-4, 6, 4);
+scene.add(fill);
+
+// --- 3→1→2 Network Parameters ---
+let studyHrs = 6.0;
+let sleepHrs = 7.0;
+let pastGpa = 3.0;
+
+// Layer 1: 3 inputs → 1 hidden
+const W1 = [0.35, 0.20, 0.40];
+const b1 = [0.05, 0.05, 0.05];
+// Layer 2: 1 hidden → 2 outputs
+const W2 = [15.0, 14.0];
+let b2 = [2.0, 1.0];
+
+function forwardPass(study, sleep, gpa) {
+  const z1 = W1[0]*study + b1[0] + W1[1]*sleep + b1[1] + W1[2]*gpa + b1[2];
+  const h = Math.max(0, z1); // ReLU
+  const eng = Math.min(100, Math.max(0, W2[0]*h + b2[0]));
+  const math = Math.min(100, Math.max(0, W2[1]*h + b2[1]));
+  return { h, eng, math };
+}
+
+let { h: hiddenVal, eng: engVal, math: mathVal } = forwardPass(studyHrs, sleepHrs, pastGpa);
+
+// --- Layout Positions ---
+const inputPositions = [
+  new THREE.Vector3(-5, 2.8, 0),   // Study
+  new THREE.Vector3(-5, 0, 0),     // Sleep
+  new THREE.Vector3(-5, -2.8, 0)   // Past GPA
+];
+const hiddenPos = new THREE.Vector3(0, 0, 0);
+const outputPositions = [
+  new THREE.Vector3(5, 1.8, 0),     // English
+  new THREE.Vector3(5, -1.8, 0)     // Math
+];
+
+// --- Shared materials ---
+function dotMat(color) {
+  return new THREE.MeshBasicMaterial({ color });
+}
+
+function glowDot(color, pos, radius=0.25) {
+  const group = new THREE.Group();
+  const dot = new THREE.Mesh(new THREE.SphereGeometry(radius, 20, 20), dotMat(color));
+  dot.position.copy(pos);
+  group.add(dot);
+  return group;
+}
+
+function makeLabel(text, color, borderColor, fontSize='13px') {
+  const el = document.createElement('div');
+  el.textContent = text;
+  el.style.color = color;
+  el.style.fontSize = fontSize;
+  el.style.fontWeight = '400';
+  el.style.fontFamily = "'JetBrains Mono',monospace";
+  el.style.textShadow = `0 0 12px ${borderColor}40`;
+  el.style.background = 'rgba(8,8,28,0.6)';
+  el.style.backdropFilter = 'blur(4px)';
+  el.style.padding = '3px 10px';
+  el.style.borderRadius = '4px';
+  el.style.border = `1px solid ${borderColor}50`;
+  el.style.boxShadow = `0 0 20px ${borderColor}15, inset 0 0 20px ${borderColor}08`;
+  el.style.letterSpacing = '0.5px';
+  el.style.whiteSpace = 'nowrap';
+  const label = new CSS2DObject(el);
+  return label;
+}
+
+// --- Build Groups ---
+const nodeGroup = new THREE.Group();
+const connectionGroup = new THREE.Group();
+const signalGroup = new THREE.Group();
+scene.add(nodeGroup);
+scene.add(connectionGroup);
+scene.add(signalGroup);
+
+// --- Input Layer (3 nodes) ---
+const inputLabels = ['STUDY', 'SLEEP', 'PAST GPA'];
+const inputColors = [0x4488ff, 0xff8800, 0xaa44ff];
+const inputBorder = ['#4488ff', '#ff8800', '#aa44ff'];
+const inputNodes = [];
+const inputCSSLabels = [];
+
+inputPositions.forEach((pos, i) => {
+  const grp = glowDot(inputColors[i], pos, 0.22);
+  nodeGroup.add(grp);
+  inputNodes.push(grp);
+
+  const lbl = makeLabel(`${inputLabels[i]} ${i===0?studyHrs.toFixed(1)+'h':i===1?sleepHrs.toFixed(1)+'h':pastGpa.toFixed(1)}`, inputBorder[i], inputBorder[i]);
+  lbl.position.set(pos.x, pos.y - 0.8, pos.z);
+  nodeGroup.add(lbl);
+  inputCSSLabels.push(lbl);
+});
+
+// --- Hidden Layer (1 node) — math variable, not neuron ---
+const hiddenNode = new THREE.Group();
+const hiddenWire = new THREE.Mesh(
+  new THREE.OctahedronGeometry(0.5, 0),
+  new THREE.MeshBasicMaterial({
+    color: 0x00ddcc,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.4
+  })
+);
+hiddenWire.position.copy(hiddenPos);
+hiddenNode.add(hiddenWire);
+const hiddenCore = new THREE.Mesh(
+  new THREE.SphereGeometry(0.08, 12, 12),
+  new THREE.MeshBasicMaterial({ color: 0x00ddcc })
+);
+hiddenCore.position.copy(hiddenPos);
+hiddenNode.add(hiddenCore);
+nodeGroup.add(hiddenNode);
+
+const reluLabel = makeLabel('ReLU', '#00ddcc', '#00ddcc', '9px');
+reluLabel.position.set(0, 0.45, 0);
+nodeGroup.add(reluLabel);
+
+const hiddenLabel = makeLabel(`h = ${hiddenVal.toFixed(2)}`, '#00ddcc', '#00ddcc');
+hiddenLabel.position.set(0, 1.0, 0);
+nodeGroup.add(hiddenLabel);
+
+const hiddenBiasLabel = makeLabel(`z₁=${(W1[0]*studyHrs+b1[0]+W1[1]*sleepHrs+b1[1]+W1[2]*pastGpa+b1[2]).toFixed(2)}`, '#4488aa', '#4488aa', '10px');
+hiddenBiasLabel.position.set(0, -1.0, 0);
+nodeGroup.add(hiddenBiasLabel);
+
+// --- Output Layer (2 nodes) ---
+const outputLabels = ['ENGLISH', 'MATH'];
+const outputColors = [0x44ff88, 0xff8844];
+const outputBorders = ['#44ff88', '#ff8844'];
+const outputNodes = [];
+const outputCSSLabels = [];
+const outputBiasLabels = [];
+
+outputPositions.forEach((pos, i) => {
+  const grp = glowDot(outputColors[i], pos, 0.28);
+  nodeGroup.add(grp);
+  outputNodes.push(grp);
+
+  const lbl = makeLabel('', outputBorders[i], outputBorders[i]);
+  lbl.position.set(pos.x, pos.y - 0.8, pos.z);
+  lbl.element.style.opacity = '0';
+  nodeGroup.add(lbl);
+  outputCSSLabels.push(lbl);
+
+  const blbl = makeLabel(`+b₂[${i}]=${b2[i].toFixed(2)}`, outputBorders[i], outputBorders[i], '10px');
+  blbl.position.set(pos.x, pos.y + 1.0, pos.z);
+  nodeGroup.add(blbl);
+  outputBiasLabels.push(blbl);
+});
+
+// --- Curves: 3 inputs → 1 hidden ---
+const inputCurves = [];
+
+inputPositions.forEach((pos, i) => {
+  const curve = new THREE.LineCurve3(pos.clone(), hiddenPos.clone());
+  inputCurves.push(curve);
+
+  const pts = curve.getPoints(30);
+  const geo = new THREE.BufferGeometry().setFromPoints(pts);
+  const opacity = 0.4 + Math.abs(W1[i]) * 0.3;
+  const mat = new THREE.LineBasicMaterial({ color: inputColors[i], transparent: true, opacity });
+  const line = new THREE.Line(geo, mat);
+  connectionGroup.add(line);
+
+  const wlbl = makeLabel(`W₁[${i}]=${W1[i].toFixed(2)}`, inputBorder[i], inputBorder[i], '10px');
+  const nearInput = curve.getPoint(0.15);
+  wlbl.position.set(nearInput.x + 0.2, nearInput.y + 0.2, nearInput.z);
+  connectionGroup.add(wlbl);
+
+  const blbl = makeLabel(`b₁[${i}]=${b1[i].toFixed(2)}`, inputBorder[i], inputBorder[i], '10px');
+  const bpos = curve.getPoint(0.3);
+  blbl.position.set(bpos.x + 0.2, bpos.y - 0.25, bpos.z);
+  connectionGroup.add(blbl);
+});
+
+// --- Curves: 1 hidden → 2 outputs ---
+const outputCurves = [];
+
+outputPositions.forEach((pos, i) => {
+  const curve = new THREE.LineCurve3(hiddenPos.clone(), pos.clone());
+  outputCurves.push(curve);
+
+  const pts = curve.getPoints(25);
+  const geo = new THREE.BufferGeometry().setFromPoints(pts);
+  const opacity = 0.5 + Math.abs(W2[i]) * 0.4;
+  const mat = new THREE.LineBasicMaterial({ color: outputColors[i], transparent: true, opacity });
+  const line = new THREE.Line(geo, mat);
+  connectionGroup.add(line);
+
+  const lbl = makeLabel(`W₂[${i}]=${W2[i].toFixed(2)}`, outputBorders[i], outputBorders[i], '11px');
+  const nearOutput = curve.getPoint(0.8);
+  lbl.position.set(nearOutput.x - 0.3, nearOutput.y + 0.3, nearOutput.z);
+  connectionGroup.add(lbl);
+});
+
+// --- Signal Particle — lightning bolt with glow ---
+const boltMat = new THREE.LineBasicMaterial({
+  color: 0x88ddff,
+  transparent: true,
+  opacity: 1.0,
+  blending: THREE.AdditiveBlending
+});
+const glowMat = new THREE.LineBasicMaterial({
+  color: 0x4488ff,
+  transparent: true,
+  opacity: 0.25,
+  blending: THREE.AdditiveBlending
+});
+const boltGeo = new THREE.BufferGeometry();
+const boltPositions = new Float32Array(60 * 3);
+const glowPositions = new Float32Array(60 * 3);
+boltGeo.setAttribute('position', new THREE.BufferAttribute(boltPositions, 3));
+boltGeo.setDrawRange(0, 0);
+const boltLine = new THREE.Line(boltGeo, boltMat);
+signalGroup.add(boltLine);
+const glowGeo = new THREE.BufferGeometry();
+glowGeo.setAttribute('position', new THREE.BufferAttribute(glowPositions, 3));
+glowGeo.setDrawRange(0, 0);
+const glowLine = new THREE.Line(glowGeo, glowMat);
+signalGroup.add(glowLine);
+
+const flowLabel = makeLabel('', '#88ff88', '#88ff88', '11px');
+signalGroup.add(flowLabel);
+
+// --- Grid & Decorations ---
+const grid = new THREE.GridHelper(16, 16, 0x4488ff, 0x224488);
+grid.position.y = -3.2;
+grid.material.transparent = true;
+grid.material.opacity = 0.25;
+scene.add(grid);
+
+const archLabel = makeLabel('3 → 1 → 2', '#4488ff', '#4488ff', '12px');
+archLabel.position.set(0, -3.2, 0);
+scene.add(archLabel);
+
+// --- Animation Loop ---
+let time = 0;
+const statsDiv = document.getElementById('stats');
+const studySlider = document.getElementById('studySlider');
+const sleepSlider = document.getElementById('sleepSlider');
+const gpaSlider = document.getElementById('gpaSlider');
+const studyVal = document.getElementById('studyVal');
+const sleepVal = document.getElementById('sleepVal');
+const gpaVal = document.getElementById('gpaVal');
+
+[studySlider, sleepSlider, gpaSlider].forEach((slider) => {
+  slider.addEventListener('input', () => {
+    studyHrs = parseFloat(studySlider.value);
+    sleepHrs = parseFloat(sleepSlider.value);
+    pastGpa = parseFloat(gpaSlider.value);
+    studyVal.textContent = studyHrs.toFixed(1) + 'h';
+    sleepVal.textContent = sleepHrs.toFixed(1) + 'h';
+    gpaVal.textContent = pastGpa.toFixed(1);
+    const fwd = forwardPass(studyHrs, sleepHrs, pastGpa);
+    hiddenVal = fwd.h; engVal = fwd.eng; mathVal = fwd.math;
+  });
+});
+
+function animate() {
+  requestAnimationFrame(animate);
+  time += 0.01;
+  controls.update();
+
+  // Lightning bolt: traverse input→hidden→output
+  const total = inputCurves.length + outputCurves.length;
+  const cycle = (time * 0.07) % 1; // ~14 sec per cycle
+  const rawPos = cycle * total;
+  const fwd = forwardPass(studyHrs, sleepHrs, pastGpa);
+  hiddenVal = fwd.h; engVal = fwd.eng; mathVal = fwd.math;
+
+  // Track which output nodes have been reached for persistent labels
+  if (!window._outputRevealed) window._outputRevealed = [false, false];
+  const revealed = window._outputRevealed;
+
+  let flowText = '';
+  let boltStart, boltEnd;
+  if (rawPos < inputCurves.length) {
+    const idx = Math.floor(rawPos);
+    const t = rawPos - idx;
+    boltStart = inputPositions[idx].clone();
+    boltEnd = inputCurves[idx].getPoint(t);
+    flowLabel.position.set(boltEnd.x, boltEnd.y + 0.5, boltEnd.z);
+    const inputVal = [studyHrs, sleepHrs, pastGpa][idx];
+    const contrib = W1[idx] * inputVal + b1[idx];
+    flowText = contrib.toFixed(2);
+  } else {
+    const idx = Math.floor(rawPos - inputCurves.length);
+    const t = rawPos - inputCurves.length - idx;
+    if (idx < outputCurves.length) {
+      boltStart = hiddenPos.clone();
+      boltEnd = outputCurves[idx].getPoint(t);
+      flowLabel.position.set(boltEnd.x, boltEnd.y + 0.5, boltEnd.z);
+      if (t > 0.92) {
+        flowText = idx === 0 ? engVal.toFixed(1) : mathVal.toFixed(1);
+        if (!revealed[idx]) {
+          revealed[idx] = true;
+          outputCSSLabels[idx].element.textContent = `${outputLabels[idx]}: ${(idx===0?engVal:mathVal).toFixed(1)}`;
+          outputCSSLabels[idx].element.style.opacity = '';
+        }
+      } else {
+        flowText = '';
+      }
+    }
+  }
+
+  if (boltStart && boltEnd) {
+    const segs = 10;
+    const pos = boltLine.geometry.attributes.position.array;
+    const gpos = glowLine.geometry.attributes.position.array;
+    for (let i = 0; i <= segs; i++) {
+      const t = i / segs;
+      const x = boltStart.x + (boltEnd.x - boltStart.x) * t;
+      const y = boltStart.y + (boltEnd.y - boltStart.y) * t;
+      const j = Math.sin(t * Math.PI) * (Math.random() - 0.5) * 0.15;
+      pos[i * 3] = x + j * 1.5;
+      pos[i * 3 + 1] = y + j * 3 + (Math.random() - 0.5) * 0.1;
+      pos[i * 3 + 2] = 0;
+      const gj = Math.sin(t * Math.PI) * (Math.random() - 0.5) * 0.4;
+      gpos[i * 3] = x + gj * 2.5;
+      gpos[i * 3 + 1] = y + gj * 4 + (Math.random() - 0.5) * 0.3;
+      gpos[i * 3 + 2] = (Math.random() - 0.5) * 0.3;
+    }
+    boltLine.geometry.attributes.position.needsUpdate = true;
+    boltLine.geometry.setDrawRange(0, segs + 1);
+    glowLine.geometry.attributes.position.needsUpdate = true;
+    glowLine.geometry.setDrawRange(0, segs + 1);
+    glowMat.opacity = 0.15 + Math.random() * 0.2;
+  } else {
+    boltLine.geometry.setDrawRange(0, 0);
+    glowLine.geometry.setDrawRange(0, 0);
+  }
+  flowLabel.element.textContent = flowText;
+
+  // Animate hidden node — wireframe rotates, ReLU gate colors
+  const reluActive = hiddenVal > 0;
+  const reluColor = reluActive ? 0x00ddcc : 0xff3344;
+  hiddenWire.material.color.setHex(reluColor);
+  hiddenWire.material.opacity = reluActive ? 0.5 : 0.25;
+  hiddenWire.rotation.x += 0.005;
+  hiddenWire.rotation.y += 0.008;
+  hiddenCore.material.color.setHex(reluColor);
+  reluLabel.element.style.color = reluActive ? '#00ddcc' : '#ff3344';
+  reluLabel.element.style.borderColor = reluActive ? '#00ddcc' : '#ff3344';
+
+  // Animate output nodes
+  outputNodes.forEach((grp, i) => {
+    const dot = grp.children[0];
+    const score = i === 0 ? engVal : mathVal;
+    const hue = 0.3 + score * 0.003;
+    dot.material.color.setHSL(hue, 1, 0.6);
+  });
+
+  // Update labels
+  inputCSSLabels.forEach((lbl, i) => {
+    const val = i === 0 ? studyHrs.toFixed(1)+'h' : i === 1 ? sleepHrs.toFixed(1)+'h' : pastGpa.toFixed(1);
+    lbl.element.textContent = `${inputLabels[i]} ${val}`;
+  });
+  hiddenLabel.element.textContent = `h = ${hiddenVal.toFixed(2)}`;
+  hiddenBiasLabel.element.textContent = `z₁=${(W1[0]*studyHrs+b1[0]+W1[1]*sleepHrs+b1[1]+W1[2]*pastGpa+b1[2]).toFixed(2)}`;
+  outputCSSLabels.forEach((lbl, i) => {
+    if (lbl.element.style.opacity !== '0') {
+      lbl.element.textContent = `${outputLabels[i]}: ${(i===0?engVal:mathVal).toFixed(1)}`;
+    }
+  });
+
+  // Stats panel
+  statsDiv.innerHTML = `
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+      <span style="color:#4488ff">📚 Study</span><span>${studyHrs.toFixed(1)}h</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+      <span style="color:#ffaa44">😴 Sleep</span><span>${sleepHrs.toFixed(1)}h</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+      <span style="color:#cc88ff">📊 Past GPA</span><span>${pastGpa.toFixed(1)}</span>
+    </div>
+    <div style="border-top:1px solid #333;padding-top:4px;margin-top:4px">
+      <div style="display:flex;justify-content:space-between">
+        <span style="color:#44ffcc">HIDDEN</span><span>${hiddenVal.toFixed(2)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+        <span style="color:#44ff88">📖 English</span><span>${engVal.toFixed(1)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+        <span style="color:#ff8844">➕ Math</span><span>${mathVal.toFixed(1)}</span>
+      </div>
+    </div>
+    <div style="margin-top:4px;color:#888;font-size:11px">
+      z₁=${(W1[0]*studyHrs+b1[0]+W1[1]*sleepHrs+b1[1]+W1[2]*pastGpa+b1[2]).toFixed(2)}
+      ${hiddenVal>0?' → ReLU='+hiddenVal.toFixed(2):' → ReLU=0'}
+    </div>
+  `;
+
+  // Math panel
+  const s = studyHrs, sl = sleepHrs, g = pastGpa;
+  const c0 = W1[0]*s + b1[0], c1 = W1[1]*sl + b1[1], c2 = W1[2]*g + b1[2];
+  const z1 = c0 + c1 + c2;
+  const h = hiddenVal;
+  document.getElementById('math-content').innerHTML = `
+    <div class="step">z₁ = W₁[0]·Study + b₁[0] + W₁[1]·Sleep + b₁[1] + W₁[2]·GPA + b₁[2]</div>
+    <div class="val">&nbsp;&nbsp;= ${W1[0].toFixed(2)}×${s.toFixed(1)} + ${b1[0].toFixed(2)} + ${W1[1].toFixed(2)}×${sl.toFixed(1)} + ${b1[1].toFixed(2)} + ${W1[2].toFixed(2)}×${g.toFixed(1)} + ${b1[2].toFixed(2)}</div>
+    <div class="val">&nbsp;&nbsp;= ${c0.toFixed(2)} + ${c1.toFixed(2)} + ${c2.toFixed(2)}</div>
+    <div class="val" style="color:#00ddcc">&nbsp;&nbsp;= ${z1.toFixed(2)}</div>
+    <div class="step">h = ReLU(z₁) = ${h.toFixed(4)}</div>
+    <div class="result">
+      <div style="display:flex;justify-content:space-between">
+        <span class="step">English</span>
+        <span style="color:#44ff88">${W2[0].toFixed(2)}×${h.toFixed(2)} + ${b2[0].toFixed(2)} = ${engVal.toFixed(1)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+        <span class="step">Math</span>
+        <span style="color:#ff8844">${W2[1].toFixed(2)}×${h.toFixed(2)} + ${b2[1].toFixed(2)} = ${mathVal.toFixed(1)}</span>
+      </div>
+    </div>
+  `;
+
+  renderer.render(scene, camera);
+  labelRenderer.render(scene, camera);
+}
+
+animate();
+
+// --- Resize ---
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  labelRenderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+console.log('🧠 3→1→2 Student Predictor Loaded!');
+console.log(`📊 Inputs: ${studyHrs}h study · ${sleepHrs}h sleep · ${pastGpa} GPA`);
+console.log(`🎯 Predicted → English: ${engVal.toFixed(1)} · Math: ${mathVal.toFixed(1)}`);
+</script>
+</body>
+</html>
