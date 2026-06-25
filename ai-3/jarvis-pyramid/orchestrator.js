@@ -1,6 +1,6 @@
 import { scene, camera, renderer, labelRenderer, orbitControls } from './core.js';
 import { getData, miniFuseSearch, openPanelData, closePanel, activePanelData, isHumanInteracted, autoDemoTimer, autoCloseTimer, setHumanInteracted, setAutoDemoTimer, setAutoCloseTimer, clearAutoDemo, clearAutoClose } from './data.js';
-import { buildPyramid } from './builder.js';
+import { buildPyramid, toggleProject } from './builder.js';
 import * as THREE from 'three';
 import { DragControls } from 'three/addons/controls/DragControls.js';
 
@@ -73,8 +73,8 @@ renderer.domElement.addEventListener('click', (e) => {
     const hits = raycaster.intersectObjects(cls);
 
     if (hits.length) {
-        const d = hits[0].object.userData;
-        openPanelData(d);
+        const obj = hits[0].object;
+        if (obj.userData.isCore) toggleProject(obj);
     }
 });
 

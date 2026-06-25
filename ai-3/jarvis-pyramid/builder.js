@@ -110,7 +110,10 @@ function buildPyramid(pyramidData) {
             allLines.push(line);
             featureMesh.userData.line = line;
         });
+        // Hide features by default
+        childFeatures.forEach(f => { f.visible = false; if (f.userData.label) f.userData.label.visible = false; if (f.userData.line) f.userData.line.visible = false; });
         ghost.userData.childFeatures = childFeatures;
+        ghost.userData.expanded = false;
     }
 
     // Place pyramid projects (with features)
@@ -138,4 +141,21 @@ function buildPyramid(pyramidData) {
     return { clickables, draggables, allLines, allSearchableNodes };
 }
 
-export { buildPyramid };
+let selectedProject = null;
+
+function toggleProject(ghost) {
+    // Close previous
+    if (selectedProject && selectedProject !== ghost) {
+        const prev = selectedProject.userData.childFeatures || [];
+        prev.forEach(f => { f.visible = false; if (f.userData.label) f.userData.label.visible = false; if (f.userData.line) f.userData.line.visible = false; });
+        selectedProject.userData.expanded = false;
+    }
+    // Toggle current
+    const features = ghost.userData.childFeatures || [];
+    const willExpand = !ghost.userData.expanded;
+    features.forEach(f => { f.visible = willExpand; if (f.userData.label) f.userData.label.visible = willExpand; if (f.userData.line) f.userData.line.visible = willExpand; });
+    ghost.userData.expanded = willExpand;
+    selectedProject = willExpand ? ghost : null;
+}
+
+export { buildPyramid, toggleProject };

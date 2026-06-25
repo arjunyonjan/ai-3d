@@ -33,6 +33,12 @@
             backdrop-filter: blur(4px); background: rgba(0, 229, 255, 0.03);
         }
         .folder-label svg { vertical-align: middle; }
+        #brand-left { position: fixed; top: 20px; left: 24px; z-index: 30; pointer-events: none; }
+        #brand-left .name { font-size: 0.75rem; letter-spacing: 3px; color: #00e5ff; text-shadow: 0 0 20px rgba(0,229,255,0.3); font-weight: 500; }
+        #brand-left .tag { font-size: 0.5rem; letter-spacing: 2px; color: rgba(160,196,212,0.3); margin-top: 2px; }
+        #brand-right { position: fixed; top: 20px; right: 24px; z-index: 30; text-align: right; pointer-events: none; }
+        #brand-right .name { font-size: 0.75rem; letter-spacing: 3px; color: #ffaa33; text-shadow: 0 0 20px rgba(255,170,51,0.3); font-weight: 500; }
+        #brand-right .tag { font-size: 0.5rem; letter-spacing: 2px; color: rgba(160,196,212,0.3); margin-top: 2px; }
         .feature-label {
             font-size: 0.65rem; background: transparent; padding: 2px 10px;
             pointer-events: none; white-space: nowrap;
@@ -55,7 +61,7 @@
         #legend .r { background: #ff0022; box-shadow: 0 0 20px #ff002233; }
 
         #view-toggle {
-            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            position: absolute; top: 50px; left: 50%; transform: translateX(-50%);
             z-index: 25; display: flex; gap: 2px;
             background: rgba(10, 18, 30, 0.6); backdrop-filter: blur(12px);
             padding: 3px; border-radius: 6px; border: 1px solid rgba(0, 229, 255, 0.08);
@@ -70,6 +76,8 @@
     </style>
 </head>
 <body>
+    <div id="brand-left"><div class="name">▲ ALPINIST STUDIO</div><div class="tag">AI ENGINEERING</div></div>
+    <div id="brand-right"><div class="name">YONJAN VENTURES</div><div class="tag">✦  ELEVATE</div></div>
     <div id="view-toggle">
         <span class="vt-btn active" data-mode="category">CATEGORY</span>
         <span class="vt-btn" data-mode="alpha">A–Z</span>
