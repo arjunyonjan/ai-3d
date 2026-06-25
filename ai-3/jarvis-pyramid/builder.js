@@ -26,11 +26,25 @@ function buildPyramid(pyramidData) {
         const labelDiv = document.createElement('div');
         labelDiv.className = 'folder-label';
         labelDiv.dataset.platform = folder.platform || 'wsl';
-        const techIcon = {
-            rust: '🦀', nextjs: '▲', vite: '⚡', react: '⚛', python: '🐍',
-            html: '</>', node: '◻', electron: '⚡', three: '◈', playwright: '🎭',
-        }[folder.tech] || '○';
-        labelDiv.innerHTML = `<span style="margin-right:4px">${techIcon}</span> ${folder.folder}`;
+        const icons = {
+            rust: '<svg viewBox="0 0 16 16" width="10" height="10"><circle cx="8" cy="8" r="5" fill="none" stroke="#ce422b" stroke-width="1.2"/><circle cx="6" cy="6" r="0.8" fill="#ce422b"/><circle cx="10" cy="6" r="0.8" fill="#ce422b"/><path d="M5 11 Q8 13 11 11" fill="none" stroke="#ce422b" stroke-width="0.8"/><path d="M3 6 L1 4 M5 5 L3 3 M11 5 L13 3 M13 6 L15 4 M4 10 L2 12 M12 10 L14 12" stroke="#ce422b" stroke-width="0.6"/></svg>',
+            nextjs: '<svg viewBox="0 0 16 16" width="10" height="10"><circle cx="8" cy="8" r="7" fill="#111"/><text x="8" y="11" text-anchor="middle" fill="#fff" font-size="8" font-weight="bold">N</text></svg>',
+            vite: '<svg viewBox="0 0 16 16" width="10" height="10"><polygon points="8,1 15,14 1,14" fill="none" stroke="#646cff" stroke-width="1.2"/><text x="8" y="12" text-anchor="middle" fill="#646cff" font-size="7" font-weight="bold">V</text></svg>',
+            react: '<svg viewBox="0 0 16 16" width="10" height="10"><circle cx="8" cy="8" r="1.5" fill="#61dafb"/><ellipse cx="8" cy="8" rx="6" ry="2.5" fill="none" stroke="#61dafb" stroke-width="0.8"/><ellipse cx="8" cy="8" rx="6" ry="2.5" fill="none" stroke="#61dafb" stroke-width="0.8" transform="rotate(60 8 8)"/><ellipse cx="8" cy="8" rx="6" ry="2.5" fill="none" stroke="#61dafb" stroke-width="0.8" transform="rotate(-60 8 8)"/></svg>',
+            python: '<svg viewBox="0 0 16 16" width="10" height="10"><path d="M5 1h6v3H5z" fill="#3776ab"/><path d="M11 4h2v5H5v2H3V4h2z" fill="#3776ab"/><path d="M11 11V8H5V6h6l2 2v3z" fill="#ffd43b"/><circle cx="4" cy="3" r="0.5" fill="#fff"/><circle cx="12" cy="12" r="0.5" fill="#fff"/></svg>',
+            html: '<svg viewBox="0 0 16 16" width="10" height="10"><polygon points="2,1 14,1 12.5,13 8,15 3.5,13" fill="none" stroke="#e44d26" stroke-width="1"/><text x="8" y="11" text-anchor="middle" fill="#e44d26" font-size="6" font-weight="bold">5</text></svg>',
+            node: '<svg viewBox="0 0 16 16" width="10" height="10"><polygon points="8,1 14,4.5 14,11.5 8,15 2,11.5 2,4.5" fill="none" stroke="#83cd29" stroke-width="1"/><text x="8" y="11" text-anchor="middle" fill="#83cd29" font-size="7" font-weight="bold">n</text></svg>',
+            three: '<svg viewBox="0 0 16 16" width="10" height="10"><polygon points="8,1 15,12 1,12" fill="none" stroke="#049ef4" stroke-width="1"/><text x="8" y="11" text-anchor="middle" fill="#049ef4" font-size="6">3</text></svg>',
+            playwright: '<svg viewBox="0 0 16 16" width="10" height="10"><rect x="2" y="4" width="12" height="8" rx="1" fill="none" stroke="#45ba4b" stroke-width="1"/><circle cx="8" cy="8" r="2" fill="none" stroke="#45ba4b" stroke-width="0.8"/><circle cx="5" cy="6.5" r="0.6" fill="#45ba4b"/><circle cx="11" cy="6.5" r="0.6" fill="#45ba4b"/></svg>',
+            electron: '<svg viewBox="0 0 16 16" width="10" height="10"><circle cx="8" cy="8" r="2" fill="none" stroke="#47848f" stroke-width="0.8"/><ellipse cx="8" cy="8" rx="5.5" ry="2" fill="none" stroke="#47848f" stroke-width="0.6"/><ellipse cx="8" cy="8" rx="5.5" ry="2" fill="none" stroke="#47848f" stroke-width="0.6" transform="rotate(60 8 8)"/><ellipse cx="8" cy="8" rx="5.5" ry="2" fill="none" stroke="#47848f" stroke-width="0.6" transform="rotate(-60 8 8)"/></svg>',
+        };
+        const platIcons = {
+            win: '<svg viewBox="0 0 16 16" width="7" height="7" style="margin-left:3px"><rect x="1" y="1" width="6" height="6" fill="#00aaff"/><rect x="9" y="1" width="6" height="6" fill="#00aaff"/><rect x="1" y="9" width="6" height="6" fill="#00aaff"/><rect x="9" y="9" width="6" height="6" fill="#00aaff"/></svg>',
+            wsl: '<svg viewBox="0 0 16 16" width="7" height="7" style="margin-left:3px"><circle cx="8" cy="8" r="6" fill="none" stroke="#ff8800" stroke-width="1.5"/><circle cx="8" cy="8" r="1.5" fill="#ff8800"/><circle cx="4" cy="5" r="1" fill="#ff8800"/><circle cx="12" cy="5" r="1" fill="#ff8800"/><circle cx="8" cy="12" r="1" fill="#ff8800"/></svg>',
+        };
+        const iconSvg = icons[folder.tech] || '';
+        const platSvg = platIcons[folder.platform] || '';
+        labelDiv.innerHTML = `${iconSvg} ${folder.folder}${platSvg}`;
         const label = new CSS2DObject(labelDiv);
         label.position.set(cx, cy, cz);
         scene.add(label);
