@@ -19,6 +19,9 @@
 - [x] Success/fail icons on feature labels (✓ / ⚠)
 - [x] Glow halos follow their node during drag
 - [x] Playwright isolation test
+- [x] Polymorphic _followers drag pattern — web lines, halos, labels, feature lines follow dragged node
+- [x] Feature ghost hitbox (invisible sphere) for drag/click on feature label text
 
 ## TODO
 - [ ] **Label icons/container click not toggling** — only text click works; icons and empty area of label div don't trigger isolation/toggle
+- [ ] **White/black sphere artifacts on back** — ghost spheres or glow sprites leave circular artifacts when transitioning from isolation to full view

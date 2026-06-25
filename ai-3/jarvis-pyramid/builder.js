@@ -75,7 +75,7 @@ function buildPyramid(pyramidData) {
             grad.addColorStop(1, 'rgba(0,0,0,0)');
             hctx.fillStyle = grad;
             hctx.fillRect(0, 0, 128, 128);
-            const haloMat = new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(haloCanvas), blending: THREE.AdditiveBlending, transparent: true, opacity: 0.8, depthWrite: false });
+            const haloMat = new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(haloCanvas), color: 0x00ffa0, blending: THREE.AdditiveBlending, transparent: true, opacity: 0.8, depthWrite: false });
             const halo = new THREE.Sprite(haloMat);
             halo.scale.set(12, 12, 1);
             halo.position.set(cx, cy, cz);
@@ -128,6 +128,7 @@ function buildPyramid(pyramidData) {
 
             const featMat = new THREE.SpriteMaterial({
                 map: glowTex,
+                color: feat.status === 'fail' ? 0xff4433 : 0x1af0b8,
                 blending: THREE.AdditiveBlending,
                 transparent: true,
                 opacity: 0.8,
@@ -152,9 +153,6 @@ function buildPyramid(pyramidData) {
                 }
             });
             scene.add(featureMesh);
-            clickables.push(featureMesh);
-            draggables.push(featureMesh);
-            allSearchableNodes.push(featureMesh);
             childFeatures.push(featureMesh);
 
             const featDiv = document.createElement('div');
@@ -179,6 +177,37 @@ function buildPyramid(pyramidData) {
             scene.add(line);
             allLines.push(line);
             featureMesh.userData.line = line;
+
+            // Invisible ghost sphere for drag/click — covers the label area
+            const featGhost = new THREE.Mesh(
+                new THREE.SphereGeometry(1.5, 8, 8),
+                new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })
+            );
+            featGhost.position.set(fx, fy, fz);
+            featGhost.userData = {
+                isFeature: true,
+                targetSprite: featureMesh,
+                coreRef: ghost,
+                text: feat.text,
+                folder: folder.folder,
+                label: featLabel,
+                line: line,
+            };
+            featGhost.userData._followers = [];
+            featGhost.userData._followers.push(pos => featLabel.position.copy(pos));
+            featGhost.userData._followers.push(pos => {
+                featureMesh.position.copy(pos);
+            });
+            featGhost.userData._followers.push(pos => {
+                if (line) {
+                    line.geometry.dispose();
+                    line.geometry = new THREE.BufferGeometry().setFromPoints([ghost.position, pos]);
+                }
+            });
+            scene.add(featGhost);
+            clickables.push(featGhost);
+            draggables.push(featGhost);
+            allSearchableNodes.push(featGhost);
             }
         }
         // Hide features by default

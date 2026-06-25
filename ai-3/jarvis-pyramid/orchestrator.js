@@ -113,8 +113,9 @@ renderer.domElement.addEventListener('pointermove', (e) => {
         if (!obj.visible) return;
         const isHovered = hits.length > 0 && hits[0].object === obj;
         if (obj.userData.isFeature) {
+            const target = obj.userData.targetSprite || obj;
             const s = isHovered ? 0.8 : 0.5;
-            obj.scale.set(s, s, 1);
+            target.scale.set(s, s, 1);
         }
     });
 });
@@ -161,6 +162,13 @@ renderer.domElement.addEventListener('click', (e) => {
                         if (c.userData.halo) c.userData.halo.visible = false;
                     }
                 });
+                // Shrink the isolated node's glow halo and hitbox for close-up view
+                if (obj.userData.halo) {
+                    obj.userData._savedHaloScale = obj.userData.halo.scale.x;
+                    obj.userData.halo.scale.setScalar(4);
+                }
+                obj.userData._savedGhostScale = obj.scale.x;
+                obj.scale.setScalar(0.3);
                 webLines.forEach(l => l.visible = false);
                 document.getElementById('back-view').style.display = 'block';
                 // Start camera animation toward the clicked node
@@ -234,6 +242,14 @@ document.getElementById('back-view').addEventListener('click', () => {
     document.getElementById('back-view').style.display = 'none';
     const sel = getSelectedProject();
     if (sel) {
+        // Restore halo scale
+        if (sel.userData.halo && sel.userData._savedHaloScale) {
+            sel.userData.halo.scale.setScalar(sel.userData._savedHaloScale);
+        }
+        // Restore ghost hitbox scale
+        if (sel.userData._savedGhostScale) {
+            sel.scale.setScalar(sel.userData._savedGhostScale);
+        }
         const features = sel.userData.childFeatures || [];
         features.forEach(f => { f.visible = false; if (f.userData.label) { f.userData.label.visible = false; f.userData.label.element.style.display = 'none'; } if (f.userData.line) f.userData.line.visible = false; });
         sel.userData.expanded = false;
