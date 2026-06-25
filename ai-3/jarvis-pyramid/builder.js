@@ -178,9 +178,9 @@ function buildPyramid(pyramidData) {
             allLines.push(line);
             featureMesh.userData.line = line;
 
-            // Invisible ghost sphere for drag/click — covers the label area
+            // Invisible box ghost for drag/click — covers the label area
             const featGhost = new THREE.Mesh(
-                new THREE.SphereGeometry(1.5, 24, 24),
+                new THREE.BoxGeometry(2.5, 1.5, 0.3),
                 new THREE.MeshBasicMaterial({ color: 0x0a1410, transparent: true, opacity: 0, depthWrite: false, depthTest: false })
             );
             featGhost.position.set(fx, fy, fz);
@@ -194,7 +194,7 @@ function buildPyramid(pyramidData) {
                 line: line,
             };
             featGhost.userData._followers = [];
-            featGhost.userData._followers.push(pos => featLabel.position.copy(pos));
+            featGhost.userData._followers.push(pos => featLabel.position.set(pos.x, pos.y - 0.7, pos.z));
             featGhost.userData._followers.push(pos => {
                 featureMesh.position.copy(pos);
             });
