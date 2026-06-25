@@ -180,8 +180,8 @@ function buildPyramid(pyramidData) {
 
             // Invisible ghost sphere for drag/click — covers the label area
             const featGhost = new THREE.Mesh(
-                new THREE.SphereGeometry(1.5, 8, 8),
-                new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })
+                new THREE.SphereGeometry(1.5, 24, 24),
+                new THREE.MeshBasicMaterial({ color: 0x0a1410, transparent: true, opacity: 0, depthWrite: false, depthTest: false })
             );
             featGhost.position.set(fx, fy, fz);
             featGhost.userData = {
@@ -205,6 +205,7 @@ function buildPyramid(pyramidData) {
                 }
             });
             scene.add(featGhost);
+            childFeatures.push(featGhost);
             clickables.push(featGhost);
             draggables.push(featGhost);
             allSearchableNodes.push(featGhost);

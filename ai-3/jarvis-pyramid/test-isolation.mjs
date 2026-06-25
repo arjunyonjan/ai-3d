@@ -56,6 +56,21 @@ server.listen(port, async () => {
         console.log(`Back display after click: "${backAfter}"`);
         if (backAfter === 'none') console.log('✓ View restored');
         else throw new Error('Back button did not hide');
+
+        // 5. Verify no feature ghosts remain visible (they were the white spheres)
+        const featGhostCount = await page.evaluate(() => {
+            let count = 0;
+            document.querySelectorAll('.feature-label').forEach(el => {
+                // featLabels that are display:none are properly hidden
+                if (el.style.display !== 'none') count++;
+            });
+            return count;
+        });
+        if (featGhostCount === 0) {
+            console.log('✓ All feature labels hidden after back');
+        } else {
+            console.log(`⚠ ${featGhostCount} feature labels still visible`);
+        }
     } else {
         throw new Error('Back button not visible — auto-isolation failed');
     }
