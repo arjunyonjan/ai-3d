@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JARVIS Pro Memory Pyramid</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #0a0e17; font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; }
+        #search-wrapper {
+            position: absolute; top: 30px; left: 50%; transform: translateX(-50%);
+            z-index: 20; display: flex; justify-content: center;
+        }
+        #search-input {
+            background: rgba(10, 18, 30, 0.7); backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 229, 255, 0.15);
+            border-radius: 8px; padding: 12px 28px; width: 320px;
+            color: #a0c4d4; font-family: 'Inter', sans-serif; font-size: 0.9rem;
+            outline: none; text-align: center;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.7);
+            transition: 0.3s ease; letter-spacing: 0.5px;
+        }
+        #search-input:focus {
+            border-color: rgba(0, 229, 255, 0.5);
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.05), inset 0 0 20px rgba(0, 229, 255, 0.02);
+        }
+        #search-input::placeholder { color: rgba(160, 196, 212, 0.3); }
+        .folder-label {
+            font-size: 0.85rem; background: transparent; padding: 4px 14px;
+            pointer-events: none; color: #00e5ff;
+            text-shadow: 0 0 30px rgba(0, 229, 255, 0.3), 0 0 60px rgba(0, 229, 255, 0.1);
+            font-weight: 500; letter-spacing: 1.5px;
+            border: 1px solid rgba(0, 229, 255, 0.1); border-radius: 4px;
+            backdrop-filter: blur(4px); background: rgba(0, 229, 255, 0.03);
+        }
+        .folder-label svg { vertical-align: middle; }
+        .feature-label {
+            font-size: 0.65rem; background: transparent; padding: 2px 10px;
+            pointer-events: none; white-space: nowrap;
+            font-family: 'Inter', sans-serif; font-weight: 400;
+            letter-spacing: 0.5px; text-shadow: 0 0 20px currentColor, 0 0 40px currentColor;
+            border-radius: 2px; border-bottom: 1px solid currentColor;
+        }
+        .feature-label.success { color: #00e5ff; border-color: rgba(0, 229, 255, 0.3); }
+        .feature-label.fail { color: #ff0022; border-color: rgba(255, 0, 34, 0.3); }
+        #legend {
+            position: absolute; bottom: 40px; left: 40px;
+            font-size: 0.7rem; opacity: 0.7;
+            display: flex; gap: 25px; pointer-events: none;
+            color: rgba(160, 196, 212, 0.5);
+            font-family: 'Inter', sans-serif; letter-spacing: 1px; text-transform: uppercase;
+        }
+        #legend span { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 8px; }
+        #legend .y { background: #00e5ff; box-shadow: 0 0 20px #00e5ff33; }
+        #legend .g { background: #00e5ff; box-shadow: 0 0 20px #00e5ff33; }
+        #legend .r { background: #ff0022; box-shadow: 0 0 20px #ff002233; }
+
+        #view-toggle {
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            z-index: 25; display: flex; gap: 2px;
+            background: rgba(10, 18, 30, 0.6); backdrop-filter: blur(12px);
+            padding: 3px; border-radius: 6px; border: 1px solid rgba(0, 229, 255, 0.08);
+        }
+        .vt-btn {
+            padding: 4px 16px; font-size: 0.6rem; letter-spacing: 1.5px;
+            color: rgba(160, 196, 212, 0.4); cursor: pointer; border-radius: 4px;
+            transition: 0.2s; font-family: 'Inter', sans-serif; text-transform: uppercase;
+        }
+        .vt-btn:hover { color: rgba(160, 196, 212, 0.7); background: rgba(0, 229, 255, 0.04); }
+        .vt-btn.active { color: #00e5ff; background: rgba(0, 229, 255, 0.08); text-shadow: 0 0 15px rgba(0, 229, 255, 0.2); }
+    </style>
+</head>
+<body>
+    <div id="view-toggle">
+        <span class="vt-btn active" data-mode="category">CATEGORY</span>
+        <span class="vt-btn" data-mode="alpha">A–Z</span>
+    </div>
+    <div id="search-wrapper"><input type="text" id="search-input" placeholder="SEARCH MEMORY MAP..." /></div>
+    <div id="legend"><span class="y"></span> PROJECT <span class="g"></span> SUCCESS <span class="r"></span> FAILURE</div>
+
+
+    <script type="importmap">
+        { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
+    </script>
+
+    <script type="module" src="./orchestrator.js"></script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+import { scene, CSS2DObject } from './core.js';
+import * as THREE from 'three';
+
+function buildPyramid(pyramidData) {
+    const clickables = [];
+    const draggables = [];
+    const allLines = [];
+    const allSearchableNodes = [];
+
+    const withFeatures = pyramidData.filter(f => f.features && f.features.length > 0);
+    const withoutFeatures = pyramidData.filter(f => !f.features || f.features.length === 0);
+
+    // Pyramid rings — only projects with knowledge struggles
+    const rings = [
+        { radius: 22, y: 0, count: 9 },
+        { radius: 19, y: 3.5, count: 8 },
+        { radius: 16, y: 7.0, count: 7 },
+        { radius: 13, y: 10.5, count: 6 },
+        { radius: 10, y: 14.0, count: 5 },
+        { radius: 7, y: 17.5, count: 4 },
+        { radius: 4, y: 21.0, count: 4 },
+    ];
+    let idx = 0;
+
+    function placeNode(folder, cx, cy, cz) {
+        const labelDiv = document.createElement('div');
+        labelDiv.className = 'folder-label';
+        labelDiv.dataset.platform = folder.platform || 'wsl';
+        const winSvg = `<svg viewBox="0 0 16 16" width="9" height="9" style="vertical-align:middle;margin-right:4px"><rect x="1" y="1" width="6" height="6" fill="#00aaff"/><rect x="9" y="1" width="6" height="6" fill="#00aaff"/><rect x="1" y="9" width="6" height="6" fill="#00aaff"/><rect x="9" y="9" width="6" height="6" fill="#00aaff"/></svg>`;
+        const ubuntuSvg = `<svg viewBox="0 0 16 16" width="9" height="9" style="vertical-align:middle;margin-right:4px"><circle cx="8" cy="8" r="6" fill="none" stroke="#ff8800" stroke-width="1.8"/><circle cx="8" cy="8" r="2" fill="#ff8800"/><circle cx="3.5" cy="5" r="1.2" fill="#ff8800"/><circle cx="12.5" cy="5" r="1.2" fill="#ff8800"/><circle cx="8" cy="13" r="1.2" fill="#ff8800"/></svg>`;
+        labelDiv.innerHTML = `${folder.platform === 'win' ? winSvg : ubuntuSvg} ${folder.folder}`;
+        const label = new CSS2DObject(labelDiv);
+        label.position.set(cx, cy, cz);
+        scene.add(label);
+
+        const ghostMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false });
+        const ghost = new THREE.Mesh(new THREE.SphereGeometry(0.3, 8, 8), ghostMat);
+        ghost.position.set(cx, cy, cz);
+        ghost.userData = { text: folder.folder, folder: folder.folder, status: folder.status, description: folder.description, isCore: true, label: label };
+        scene.add(ghost);
+        clickables.push(ghost);
+        draggables.push(ghost);
+        allSearchableNodes.push(ghost);
+
+        const features = folder.features || [];
+        const featCount = features.length;
+        const featRadius = 3.0;
+        const childFeatures = [];
+        features.forEach((feat, fi) => {
+            const angle = (fi / featCount) * Math.PI * 2;
+            const fx = cx + Math.cos(angle) * featRadius;
+            const fz = cz + Math.sin(angle) * featRadius;
+            const fy = cy + 0.1;
+
+            const featColor = feat.status === 'fail' ? 0xff4433 : 0x1af0b8;
+            const glowCanvas = document.createElement('canvas');
+            glowCanvas.width = 64;
+            glowCanvas.height = 64;
+            const gctx = glowCanvas.getContext('2d');
+            const grad = gctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+            grad.addColorStop(0, feat.status === 'fail' ? '#ff0022' : '#00e5ff');
+            grad.addColorStop(0.3, feat.status === 'fail' ? 'rgba(255,0,34,0.4)' : 'rgba(0,229,255,0.4)');
+            grad.addColorStop(1, 'rgba(0,0,0,0)');
+            gctx.fillStyle = grad;
+            gctx.fillRect(0, 0, 64, 64);
+            const glowTex = new THREE.CanvasTexture(glowCanvas);
+
+            const featMat = new THREE.SpriteMaterial({
+                map: glowTex,
+                blending: THREE.AdditiveBlending,
+                transparent: true,
+                opacity: 0.8,
+                depthWrite: false,
+            });
+            const featureMesh = new THREE.Sprite(featMat);
+            featureMesh.scale.set(0.5, 0.5, 1);
+            featureMesh.position.set(fx, fy, fz);
+            featureMesh.userData = {
+                text: feat.text,
+                folder: folder.folder,
+                status: feat.status,
+                isFeature: true,
+                coreRef: ghost,
+            };
+            scene.add(featureMesh);
+            clickables.push(featureMesh);
+            draggables.push(featureMesh);
+            allSearchableNodes.push(featureMesh);
+            childFeatures.push(featureMesh);
+
+            const featDiv = document.createElement('div');
+            featDiv.className = 'feature-label ' + (feat.status === 'fail' ? 'fail' : 'success');
+            featDiv.textContent = feat.text;
+            const featLabel = new CSS2DObject(featDiv);
+            featLabel.position.set(fx, fy - 0.7, fz);
+            scene.add(featLabel);
+            featureMesh.userData.label = featLabel;
+
+            const lineGeo = new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(cx, cy, cz),
+                new THREE.Vector3(fx, fy, fz),
+            ]);
+            const lineMat = new THREE.LineBasicMaterial({
+                color: featColor,
+                transparent: true,
+                opacity: 0.08,
+            });
+            const line = new THREE.Line(lineGeo, lineMat);
+            scene.add(line);
+            allLines.push(line);
+            featureMesh.userData.line = line;
+        });
+        ghost.userData.childFeatures = childFeatures;
+    }
+
+    // Place pyramid projects (with features)
+    for (const ring of rings) {
+        const { radius, y: baseY, count } = ring;
+        for (let ci = 0; ci < count && idx < withFeatures.length; ci++, idx++) {
+            const folder = withFeatures[idx];
+            const angle = (ci / count) * Math.PI * 2 - Math.PI / 2;
+            placeNode(folder, Math.cos(angle) * radius, baseY, Math.sin(angle) * radius);
+        }
+    }
+
+    // Place random projects (without features) — scattered in space
+    const scatterRadius = 30;
+    for (const folder of withoutFeatures) {
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.random() * Math.PI * 2;
+        const r = 10 + Math.random() * (scatterRadius - 10);
+        const cx = Math.cos(theta) * r;
+        const cz = Math.sin(theta) * r;
+        const cy = -5 + Math.random() * 28;
+        placeNode(folder, cx, cy, cz);
+    }
+
+    return { clickables, draggables, allLines, allSearchableNodes };
+}
+
+export { buildPyramid };
