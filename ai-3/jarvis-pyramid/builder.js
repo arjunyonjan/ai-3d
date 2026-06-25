@@ -58,6 +58,8 @@ function buildPyramid(pyramidData) {
         const ghost = new THREE.Mesh(new THREE.SphereGeometry(ghostR, 12, 12), ghostMat);
         ghost.position.set(cx, cy, cz);
         ghost.userData = { text: folder.folder, folder: folder.folder, status: folder.status, description: folder.description, isCore: true, label: label };
+        ghost.userData._followers = [];
+        ghost.userData._followers.push(pos => label.position.copy(pos));
         scene.add(ghost);
 
         // Glow halo sprite for recent top 5
@@ -81,6 +83,7 @@ function buildPyramid(pyramidData) {
             if (!window.__recentHalos) window.__recentHalos = [];
             window.__recentHalos.push(halo);
             ghost.userData.halo = halo;
+            ghost.userData._followers.push(pos => halo.position.copy(pos));
         }
         clickables.push(ghost);
         draggables.push(ghost);
@@ -140,6 +143,14 @@ function buildPyramid(pyramidData) {
                 isFeature: true,
                 coreRef: ghost,
             };
+            featureMesh.userData._followers = [];
+            featureMesh.userData._followers.push(pos => featLabel.position.copy(pos));
+            featureMesh.userData._followers.push(pos => {
+                if (featureMesh.userData.line) {
+                    featureMesh.userData.line.geometry.dispose();
+                    featureMesh.userData.line.geometry = new THREE.BufferGeometry().setFromPoints([featureMesh.userData.coreRef.position, pos]);
+                }
+            });
             scene.add(featureMesh);
             clickables.push(featureMesh);
             draggables.push(featureMesh);
@@ -174,6 +185,14 @@ function buildPyramid(pyramidData) {
         childFeatures.forEach(f => { f.visible = false; if (f.userData.label) f.userData.label.visible = false; if (f.userData.line) f.userData.line.visible = false; });
         ghost.userData.childFeatures = childFeatures;
         ghost.userData.expanded = false;
+        ghost.userData._followers.push(pos => {
+            childFeatures.forEach(f => {
+                if (f.userData.line) {
+                    f.userData.line.geometry.dispose();
+                    f.userData.line.geometry = new THREE.BufferGeometry().setFromPoints([pos, f.position]);
+                }
+            });
+        });
     }
 
     // Place pyramid projects (with features)

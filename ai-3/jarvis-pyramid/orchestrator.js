@@ -24,20 +24,7 @@ function wireDragEvents() {
     dragControls.addEventListener('drag', (event) => {
         const obj = event.object;
         const ud = obj.userData;
-        if (ud.label) ud.label.position.copy(obj.position);
-        if (ud.halo) ud.halo.position.copy(obj.position);
-        if (ud.line && ud.coreRef) {
-            ud.line.geometry.dispose();
-            ud.line.geometry = new THREE.BufferGeometry().setFromPoints([ud.coreRef.position, obj.position]);
-        }
-        if (ud.isCore && ud.childFeatures) {
-            ud.childFeatures.forEach(feature => {
-                if (feature.userData.line) {
-                    feature.userData.line.geometry.dispose();
-                    feature.userData.line.geometry = new THREE.BufferGeometry().setFromPoints([obj.position, feature.position]);
-                }
-            });
-        }
+        if (ud._followers) ud._followers.forEach(fn => fn(obj.position));
     });
     dragControls.addEventListener('dragstart', () => { orbitControls.enabled = false; });
     dragControls.addEventListener('dragend', () => { orbitControls.enabled = true; });
@@ -102,6 +89,13 @@ function buildWebLines() {
         line.userData = { a, b, baseOpacity: mat.opacity };
         scene.add(line);
         webLines.push(line);
+        // Update web line when either endpoint is dragged
+        const updateWeb = () => {
+            line.geometry.dispose();
+            line.geometry = new THREE.BufferGeometry().setFromPoints([a.position, b.position]);
+        };
+        a.userData._followers.push(updateWeb);
+        b.userData._followers.push(updateWeb);
     });
 }
 
