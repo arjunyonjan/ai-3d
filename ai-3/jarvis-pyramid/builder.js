@@ -12,13 +12,13 @@ function buildPyramid(pyramidData) {
 
     // Pyramid rings — only projects with knowledge struggles
     const rings = [
-        { radius: 22, y: 0, count: 9 },
-        { radius: 19, y: 3.5, count: 8 },
-        { radius: 16, y: 7.0, count: 7 },
-        { radius: 13, y: 10.5, count: 6 },
-        { radius: 10, y: 14.0, count: 5 },
-        { radius: 7, y: 17.5, count: 4 },
-        { radius: 4, y: 21.0, count: 4 },
+        { radius: 32, y: 0, count: 9 },
+        { radius: 28, y: 3.5, count: 8 },
+        { radius: 24, y: 7.0, count: 7 },
+        { radius: 20, y: 10.5, count: 6 },
+        { radius: 16, y: 14.0, count: 5 },
+        { radius: 12, y: 17.5, count: 4 },
+        { radius: 8, y: 21.0, count: 4 },
     ];
     let idx = 0;
 
@@ -34,7 +34,7 @@ function buildPyramid(pyramidData) {
         scene.add(label);
 
         const ghostMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false });
-        const ghost = new THREE.Mesh(new THREE.SphereGeometry(0.3, 8, 8), ghostMat);
+        const ghost = new THREE.Mesh(new THREE.SphereGeometry(1.5, 12, 12), ghostMat);
         ghost.position.set(cx, cy, cz);
         ghost.userData = { text: folder.folder, folder: folder.folder, status: folder.status, description: folder.description, isCore: true, label: label };
         scene.add(ghost);
@@ -44,7 +44,7 @@ function buildPyramid(pyramidData) {
 
         const features = folder.features || [];
         const featCount = features.length;
-        const featRadius = 3.0;
+        const featRadius = 4.5;
         const childFeatures = [];
         features.forEach((feat, fi) => {
             const angle = (fi / featCount) * Math.PI * 2;
@@ -127,11 +127,11 @@ function buildPyramid(pyramidData) {
     }
 
     // Place random projects (without features) — scattered in space
-    const scatterRadius = 30;
+    const scatterRadius = 45;
     for (const folder of withoutFeatures) {
         const theta = Math.random() * Math.PI * 2;
         const phi = Math.random() * Math.PI * 2;
-        const r = 10 + Math.random() * (scatterRadius - 10);
+        const r = 15 + Math.random() * (scatterRadius - 15);
         const cx = Math.cos(theta) * r;
         const cz = Math.sin(theta) * r;
         const cy = -5 + Math.random() * 28;

@@ -4,8 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>JARVIS Pro Memory Pyramid</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; overflow: hidden; background: #0a0e17; font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; }
+        body { margin: 0; overflow: hidden; background: #0a0e17; font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace; }
         #search-wrapper {
             position: absolute; top: 30px; left: 50%; transform: translateX(-50%);
             z-index: 20; display: flex; justify-content: center;
@@ -14,7 +15,7 @@
             background: rgba(10, 18, 30, 0.7); backdrop-filter: blur(16px);
             border: 1px solid rgba(0, 229, 255, 0.15);
             border-radius: 8px; padding: 12px 28px; width: 320px;
-            color: #a0c4d4; font-family: 'Inter', sans-serif; font-size: 0.9rem;
+            color: #a0c4d4; font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace; font-size: 0.75rem;
             outline: none; text-align: center;
             box-shadow: 0 0 40px rgba(0, 0, 0, 0.7);
             transition: 0.3s ease; letter-spacing: 0.5px;
@@ -25,12 +26,13 @@
         }
         #search-input::placeholder { color: rgba(160, 196, 212, 0.3); }
         .folder-label {
-            font-size: 0.85rem; background: transparent; padding: 4px 14px;
+            font-size: 0.6rem; background: transparent; padding: 2px 10px;
             pointer-events: none; color: #00e5ff;
-            text-shadow: 0 0 30px rgba(0, 229, 255, 0.3), 0 0 60px rgba(0, 229, 255, 0.1);
-            font-weight: 500; letter-spacing: 1.5px;
-            border: 1px solid rgba(0, 229, 255, 0.1); border-radius: 4px;
+            text-shadow: 0 0 20px rgba(0, 229, 255, 0.25), 0 0 40px rgba(0, 229, 255, 0.08);
+            font-weight: 500; letter-spacing: 1.2px;
+            border: 1px solid rgba(0, 229, 255, 0.08); border-radius: 3px;
             backdrop-filter: blur(4px); background: rgba(0, 229, 255, 0.03);
+            font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
         }
         .folder-label svg { vertical-align: middle; }
         #brand-left { position: fixed; top: 20px; left: 24px; z-index: 30; pointer-events: none; }
@@ -40,10 +42,11 @@
         #brand-right .name { font-size: 0.75rem; letter-spacing: 3px; color: #ffaa33; text-shadow: 0 0 20px rgba(255,170,51,0.3); font-weight: 500; }
         #brand-right .tag { font-size: 0.5rem; letter-spacing: 2px; color: rgba(160,196,212,0.3); margin-top: 2px; }
         .feature-label {
-            font-size: 0.65rem; background: transparent; padding: 2px 10px;
+            font-size: 0.55rem; background: transparent; padding: 1px 8px;
             pointer-events: none; white-space: nowrap;
-            font-family: 'Inter', sans-serif; font-weight: 400;
-            letter-spacing: 0.5px; text-shadow: 0 0 20px currentColor, 0 0 40px currentColor;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+            font-weight: 400; letter-spacing: 0.3px;
+            text-shadow: 0 0 15px currentColor, 0 0 30px currentColor;
             border-radius: 2px; border-bottom: 1px solid currentColor;
         }
         .feature-label.success { color: #00e5ff; border-color: rgba(0, 229, 255, 0.3); }
@@ -53,7 +56,7 @@
             font-size: 0.7rem; opacity: 0.7;
             display: flex; gap: 25px; pointer-events: none;
             color: rgba(160, 196, 212, 0.5);
-            font-family: 'Inter', sans-serif; letter-spacing: 1px; text-transform: uppercase;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace; letter-spacing: 1px; text-transform: uppercase;
         }
         #legend span { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 8px; }
         #legend .y { background: #00e5ff; box-shadow: 0 0 20px #00e5ff33; }
