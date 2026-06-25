@@ -26,9 +26,11 @@ function buildPyramid(pyramidData) {
         const labelDiv = document.createElement('div');
         labelDiv.className = 'folder-label';
         labelDiv.dataset.platform = folder.platform || 'wsl';
-        const winSvg = `<svg viewBox="0 0 16 16" width="9" height="9" style="vertical-align:middle;margin-right:4px"><rect x="1" y="1" width="6" height="6" fill="#00aaff"/><rect x="9" y="1" width="6" height="6" fill="#00aaff"/><rect x="1" y="9" width="6" height="6" fill="#00aaff"/><rect x="9" y="9" width="6" height="6" fill="#00aaff"/></svg>`;
-        const ubuntuSvg = `<svg viewBox="0 0 16 16" width="9" height="9" style="vertical-align:middle;margin-right:4px"><circle cx="8" cy="8" r="6" fill="none" stroke="#ff8800" stroke-width="1.8"/><circle cx="8" cy="8" r="2" fill="#ff8800"/><circle cx="3.5" cy="5" r="1.2" fill="#ff8800"/><circle cx="12.5" cy="5" r="1.2" fill="#ff8800"/><circle cx="8" cy="13" r="1.2" fill="#ff8800"/></svg>`;
-        labelDiv.innerHTML = `${folder.platform === 'win' ? winSvg : ubuntuSvg} ${folder.folder}`;
+        const techIcon = {
+            rust: '🦀', nextjs: '▲', vite: '⚡', react: '⚛', python: '🐍',
+            html: '</>', node: '◻', electron: '⚡', three: '◈', playwright: '🎭',
+        }[folder.tech] || '○';
+        labelDiv.innerHTML = `<span style="margin-right:4px">${techIcon}</span> ${folder.folder}`;
         const label = new CSS2DObject(labelDiv);
         label.position.set(cx, cy, cz);
         scene.add(label);

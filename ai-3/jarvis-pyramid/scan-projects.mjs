@@ -113,6 +113,32 @@ function getDescription(dir) {
     return null;
 }
 
+function detectTech(dir) {
+    if (existsSync(join(dir, 'Cargo.toml'))) return 'rust';
+    if (existsSync(join(dir, 'pyproject.toml'))) return 'python';
+    const pkgPath = join(dir, 'package.json');
+    if (existsSync(pkgPath)) {
+        try {
+            const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
+            const deps = { ...pkg.dependencies, ...pkg.devDependencies };
+            if (deps.next) return 'nextjs';
+            if (deps.vite) return 'vite';
+            if (deps.react || deps['preact'] || deps['@preact/preset-vite']) return 'react';
+            if (deps.electron) return 'electron';
+            if (deps['@playwright/test'] || deps.playwright) return 'playwright';
+            if (deps.express) return 'node';
+            if (deps.three) return 'three';
+            return 'node';
+        } catch { return 'html'; }
+    }
+    if (existsSync(join(dir, 'index.html'))) return 'html';
+    const files = readdirSync(dir).filter(f => f.endsWith('.py'));
+    if (files.length > 0) return 'python';
+    const jsFiles = readdirSync(dir).filter(f => f.endsWith('.js') || f.endsWith('.mjs'));
+    if (jsFiles.length > 0) return 'node';
+    return 'unknown';
+}
+
 const all = [];
 for (const base of scanDirs) {
     if (!existsSync(base)) continue;
@@ -131,9 +157,11 @@ for (const base of scanDirs) {
         }
 
         const platform = base.includes('/mnt/c/') ? 'win' : 'wsl';
+        const tech = detectTech(full);
         all.push({
             folder: entry.toUpperCase(),
             platform,
+            tech,
             status: 'success',
             description: getDescription(full) || entry,
             features: features,
