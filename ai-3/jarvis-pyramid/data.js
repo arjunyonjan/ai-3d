@@ -22,7 +22,8 @@ const pyramidData = [
         "text": "THREE.CSS2DObject constructor error",
         "status": "fail"
       }
-    ]
+    ],
+    "recent": 1,
   },
   {
     "folder": "AI-CHAT-DEMO",
@@ -30,7 +31,8 @@ const pyramidData = [
     "tech": "nextjs",
     "status": "success",
     "description": "This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).",
-    "features": []
+    "features": [],
+    "recent": 20,
   },
   {
     "folder": "AI-COURSE-UI",
@@ -38,7 +40,8 @@ const pyramidData = [
     "tech": "unknown",
     "status": "success",
     "description": "ai-course-ui",
-    "features": []
+    "features": [],
+    "recent": 34,
   },
   {
     "folder": "AI-PROJECTS",
@@ -46,7 +49,8 @@ const pyramidData = [
     "tech": "unknown",
     "status": "success",
     "description": "ai-projects",
-    "features": []
+    "features": [],
+    "recent": 36,
   },
   {
     "folder": "ALPINIST-AI-PROJECTS",
@@ -54,7 +58,8 @@ const pyramidData = [
     "tech": "unknown",
     "status": "success",
     "description": "alpinist-ai-projects",
-    "features": []
+    "features": [],
+    "recent": 35,
   },
   {
     "folder": "ANTIGRAVITY",
@@ -62,7 +67,8 @@ const pyramidData = [
     "tech": "html",
     "status": "success",
     "description": "antigravity",
-    "features": []
+    "features": [],
+    "recent": 38,
   },
   {
     "folder": "BENCHMARKS",
@@ -70,7 +76,8 @@ const pyramidData = [
     "tech": "python",
     "status": "success",
     "description": "benchmarks",
-    "features": []
+    "features": [],
+    "recent": 23,
   },
   {
     "folder": "BREEVY-CLONE",
@@ -78,7 +85,8 @@ const pyramidData = [
     "tech": "vite",
     "status": "success",
     "description": "��#\u0000 \u0000b\u0000r\u0000e\u0000e\u0000v\u0000y\u0000-\u0000c\u0000l\u0000o\u0000n\u0000e\u0000\r\u0000",
-    "features": []
+    "features": [],
+    "recent": 40,
   },
   {
     "folder": "CREDIT-DEFAULT",
@@ -86,7 +94,8 @@ const pyramidData = [
     "tech": "unknown",
     "status": "success",
     "description": "credit-default",
-    "features": []
+    "features": [],
+    "recent": 37,
   },
   {
     "folder": "ELECTRON-FASTMIND",
@@ -94,7 +103,8 @@ const pyramidData = [
     "tech": "electron",
     "status": "success",
     "description": "FastMind Desktop - AI Workspace",
-    "features": []
+    "features": [],
+    "recent": 17,
   },
   {
     "folder": "MIND-RECOVERY",
@@ -102,7 +112,8 @@ const pyramidData = [
     "tech": "nextjs",
     "status": "success",
     "description": "This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).",
-    "features": []
+    "features": [],
+    "recent": 33,
   },
   {
     "folder": "NABIL-BANK-BOT",
@@ -127,7 +138,8 @@ const pyramidData = [
         "text": "Next.js frontend state management",
         "status": "success"
       }
-    ]
+    ],
+    "recent": 7,
   },
   {
     "folder": "NABIL-NEXT-DASHBOARD",
@@ -135,7 +147,8 @@ const pyramidData = [
     "tech": "nextjs",
     "status": "success",
     "description": "This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).",
-    "features": []
+    "features": [],
+    "recent": 16,
   },
   {
     "folder": "NEXT-ALPINIST-AI-COURSE",
@@ -143,7 +156,8 @@ const pyramidData = [
     "tech": "nextjs",
     "status": "success",
     "description": "This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).",
-    "features": []
+    "features": [],
+    "recent": 19,
   },
   {
     "folder": "NEXT-FASTMIND",
@@ -151,7 +165,8 @@ const pyramidData = [
     "tech": "nextjs",
     "status": "success",
     "description": "This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).",
-    "features": []
+    "features": [],
+    "recent": 15,
   },
   {
     "folder": "OHMYCODE",
@@ -159,7 +174,8 @@ const pyramidData = [
     "tech": "python",
     "status": "success",
     "description": "ohmycode",
-    "features": []
+    "features": [],
+    "recent": 8,
   },
   {
     "folder": "RUSTER",
@@ -167,7 +183,8 @@ const pyramidData = [
     "tech": "rust",
     "status": "success",
     "description": "ruster",
-    "features": []
+    "features": [],
+    "recent": 18,
   },
   {
     "folder": "VITE-TAILWIND-OFFLINE",
@@ -175,7 +192,8 @@ const pyramidData = [
     "tech": "html",
     "status": "success",
     "description": "��#\u0000 \u0000a\u0000l\u0000p\u0000i\u0000n\u0000e\u0000m\u0000i\u0000n\u0000d\u0000\r\u0000",
-    "features": []
+    "features": [],
+    "recent": 39,
   },
   {
     "folder": "WEB-NOTES",
@@ -183,7 +201,8 @@ const pyramidData = [
     "tech": "unknown",
     "status": "success",
     "description": "web-notes",
-    "features": []
+    "features": [],
+    "recent": 27,
   },
   {
     "folder": "YONJAN-VENTURES",
@@ -191,7 +210,8 @@ const pyramidData = [
     "tech": "nextjs",
     "status": "success",
     "description": "This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).",
-    "features": []
+    "features": [],
+    "recent": 10,
   },
   {
     "folder": "ZAI-PLAYWRIGHT",
@@ -208,7 +228,8 @@ const pyramidData = [
         "text": "CDP session management",
         "status": "success"
       }
-    ]
+    ],
+    "recent": 14,
   },
   {
     "folder": "3D-JUNGLE-HIKE",
@@ -216,7 +237,8 @@ const pyramidData = [
     "tech": "html",
     "status": "success",
     "description": "3d-jungle-hike",
-    "features": []
+    "features": [],
+    "recent": 30,
   },
   {
     "folder": "AI-BANK-CHAT",
@@ -241,7 +263,8 @@ const pyramidData = [
         "text": "LanceDB vector store setup",
         "status": "success"
       }
-    ]
+    ],
+    "recent": 4,
   },
   {
     "folder": "AI-IN-3D",
@@ -249,7 +272,8 @@ const pyramidData = [
     "tech": "unknown",
     "status": "success",
     "description": "ai-in-3d",
-    "features": []
+    "features": [],
+    "recent": 32,
   },
   {
     "folder": "ALPINE-EAV",
@@ -257,7 +281,8 @@ const pyramidData = [
     "tech": "python",
     "status": "success",
     "description": "alpine-eav",
-    "features": []
+    "features": [],
+    "recent": 21,
   },
   {
     "folder": "ALPINE-KNOWLEDGE-GRAPH",
@@ -265,7 +290,8 @@ const pyramidData = [
     "tech": "html",
     "status": "success",
     "description": "alpine-knowledge-graph",
-    "features": []
+    "features": [],
+    "recent": 31,
   },
   {
     "folder": "ALPINE-NLP",
@@ -273,7 +299,8 @@ const pyramidData = [
     "tech": "unknown",
     "status": "success",
     "description": "alpine-nlp",
-    "features": []
+    "features": [],
+    "recent": 26,
   },
   {
     "folder": "CNN-TRAINING",
@@ -281,7 +308,8 @@ const pyramidData = [
     "tech": "python",
     "status": "success",
     "description": "Add your description here",
-    "features": []
+    "features": [],
+    "recent": 22,
   },
   {
     "folder": "DUMMY-MCP-AGENT-TEST",
@@ -289,7 +317,8 @@ const pyramidData = [
     "tech": "unknown",
     "status": "success",
     "description": "dummy-mcp-agent-test",
-    "features": []
+    "features": [],
+    "recent": 24,
   },
   {
     "folder": "DUMMY-MCP-PYTHON",
@@ -306,7 +335,8 @@ const pyramidData = [
         "text": "Tool registration pattern",
         "status": "success"
       }
-    ]
+    ],
+    "recent": 9,
   },
   {
     "folder": "FASTAPI-VERCEL-PG",
@@ -314,7 +344,8 @@ const pyramidData = [
     "tech": "python",
     "status": "success",
     "description": "Add your description here",
-    "features": []
+    "features": [],
+    "recent": 25,
   },
   {
     "folder": "FUCHE-TEST",
@@ -322,7 +353,8 @@ const pyramidData = [
     "tech": "node",
     "status": "success",
     "description": "fuche-test",
-    "features": []
+    "features": [],
+    "recent": 3,
   },
   {
     "folder": "FUCHE-TTS-EXTENSION",
@@ -339,7 +371,8 @@ const pyramidData = [
         "text": "Streaming audio from wasm",
         "status": "success"
       }
-    ]
+    ],
+    "recent": 6,
   },
   {
     "folder": "FUCHECODE",
@@ -356,7 +389,8 @@ const pyramidData = [
         "text": "Cross-platform path handling",
         "status": "success"
       }
-    ]
+    ],
+    "recent": 2,
   },
   {
     "folder": "RUST-AI",
@@ -364,7 +398,8 @@ const pyramidData = [
     "tech": "unknown",
     "status": "success",
     "description": "rust-ai",
-    "features": []
+    "features": [],
+    "recent": 41,
   },
   {
     "folder": "BRAND",
@@ -372,7 +407,8 @@ const pyramidData = [
     "tech": "unknown",
     "status": "success",
     "description": "Fuche AI — Brand Assets",
-    "features": []
+    "features": [],
+    "recent": 28,
   },
   {
     "folder": "GRAPHIFY-OUT",
@@ -380,7 +416,8 @@ const pyramidData = [
     "tech": "unknown",
     "status": "success",
     "description": "graphify-out",
-    "features": []
+    "features": [],
+    "recent": 29,
   },
   {
     "folder": "KOKORO-RS",
@@ -401,7 +438,8 @@ const pyramidData = [
         "text": "Edge/CPU fallback latency",
         "status": "fail"
       }
-    ]
+    ],
+    "recent": 5,
   },
   {
     "folder": "TEMPLATES",
@@ -409,7 +447,8 @@ const pyramidData = [
     "tech": "html",
     "status": "success",
     "description": "templates",
-    "features": []
+    "features": [],
+    "recent": 42,
   },
   {
     "folder": "VENV",
@@ -417,7 +456,8 @@ const pyramidData = [
     "tech": "unknown",
     "status": "success",
     "description": "venv",
-    "features": []
+    "features": [],
+    "recent": 43,
   },
   {
     "folder": "XPND-CORE",
@@ -425,7 +465,8 @@ const pyramidData = [
     "tech": "rust",
     "status": "success",
     "description": "xpnd-core",
-    "features": []
+    "features": [],
+    "recent": 11,
   },
   {
     "folder": "XPND-EGUI",
@@ -433,7 +474,8 @@ const pyramidData = [
     "tech": "rust",
     "status": "success",
     "description": "xpnd-egui",
-    "features": []
+    "features": [],
+    "recent": 12,
   },
   {
     "folder": "XPND-WRY",
@@ -441,7 +483,8 @@ const pyramidData = [
     "tech": "rust",
     "status": "success",
     "description": "xpnd-wry",
-    "features": []
+    "features": [],
+    "recent": 13,
   }
 ];
 let activePanelData = null;

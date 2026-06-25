@@ -25,6 +25,8 @@
             box-shadow: 0 0 30px rgba(0, 229, 255, 0.05), inset 0 0 20px rgba(0, 229, 255, 0.02);
         }
         #search-input::placeholder { color: rgba(160, 196, 212, 0.3); }
+        .folder-label, .folder-label * { pointer-events: none !important; }
+        .feature-label, .feature-label * { pointer-events: none !important; }
         .folder-label {
             font-size: 0.6rem; background: transparent; padding: 2px 10px;
             pointer-events: none; color: #00e5ff;
@@ -35,6 +37,7 @@
             font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
         }
         .folder-label svg { vertical-align: middle; }
+        .folder-label.recent-high { color: #00ffff; border-color: rgba(0, 255, 255, 0.5); text-shadow: 0 0 35px rgba(0, 255, 255, 0.6), 0 0 70px rgba(0, 255, 255, 0.25); background: rgba(0, 255, 255, 0.07); border-width: 1.5px; }
         #brand-left { position: fixed; top: 20px; left: 24px; z-index: 30; pointer-events: none; }
         #brand-left .name { font-size: 0.75rem; letter-spacing: 3px; color: #00e5ff; text-shadow: 0 0 20px rgba(0,229,255,0.3); font-weight: 500; }
         #brand-left .tag { font-size: 0.5rem; letter-spacing: 2px; color: rgba(160,196,212,0.3); margin-top: 2px; }
@@ -42,7 +45,7 @@
         #brand-right .name { font-size: 0.75rem; letter-spacing: 3px; color: #ffaa33; text-shadow: 0 0 20px rgba(255,170,51,0.3); font-weight: 500; }
         #brand-right .tag { font-size: 0.5rem; letter-spacing: 2px; color: rgba(160,196,212,0.3); margin-top: 2px; }
         .feature-label {
-            font-size: 0.55rem; background: transparent; padding: 1px 8px;
+            font-size: 0.5rem; background: transparent; padding: 1px 6px;
             pointer-events: none; white-space: nowrap;
             font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
             font-weight: 400; letter-spacing: 0.3px;
@@ -76,6 +79,14 @@
         }
         .vt-btn:hover { color: rgba(160, 196, 212, 0.7); background: rgba(0, 229, 255, 0.04); }
         .vt-btn.active { color: #00e5ff; background: rgba(0, 229, 255, 0.08); text-shadow: 0 0 15px rgba(0, 229, 255, 0.2); }
+        #back-view {
+            position: absolute; top: 120px; left: 50%; transform: translateX(-50%); z-index: 30;
+            font-size: 2rem; color: rgba(0, 255, 160, 0.5); cursor: pointer;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+            transition: 0.2s; padding: 10px 24px; letter-spacing: 4px;
+            border-radius: 6px; background: rgba(10, 18, 30, 0.5);
+        }
+        #back-view:hover { color: #00ffa0; background: rgba(0, 255, 160, 0.1); }
     </style>
 </head>
 <body>
@@ -86,6 +97,7 @@
         <span class="vt-btn" data-mode="alpha">A–Z</span>
     </div>
     <div id="search-wrapper"><input type="text" id="search-input" placeholder="SEARCH MEMORY MAP..." /></div>
+    <div id="back-view" style="display:none">← BACK</div>
     <div id="legend"><span class="y"></span> PROJECT <span class="g"></span> SUCCESS <span class="r"></span> FAILURE</div>
 
 

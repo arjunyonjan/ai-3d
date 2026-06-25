@@ -158,6 +158,7 @@ for (const base of scanDirs) {
 
         const platform = base.includes('/mnt/c/') ? 'win' : 'wsl';
         const tech = detectTech(full);
+        const mtime = statSync(full).mtimeMs;
         all.push({
             folder: entry.toUpperCase(),
             platform,
@@ -165,9 +166,14 @@ for (const base of scanDirs) {
             status: 'success',
             description: getDescription(full) || entry,
             features: features,
+            _mtime: mtime,
         });
     }
 }
+
+// Sort by mtime descending (most recent first) and assign recent rank
+all.sort((a, b) => b._mtime - a._mtime);
+all.forEach((p, i) => { p.recent = i + 1; delete p._mtime; });
 
 const data = JSON.stringify(all, null, 2);
 

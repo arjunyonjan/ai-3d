@@ -3,7 +3,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x0a0e17);
+scene.background = new THREE.Color(0x0a1410);
 
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(55, 35, 65);
@@ -26,13 +26,12 @@ orbitControls.enableDamping = true;
 orbitControls.dampingFactor = 0.08;
 orbitControls.autoRotate = true;
 orbitControls.autoRotateSpeed = 0.08;
-orbitControls.minPolarAngle = Math.PI / 3;
-orbitControls.maxPolarAngle = Math.PI / 2.4;
+
 orbitControls.target.set(0, 10, 0);
 
-const ambient = new THREE.AmbientLight(0x224466, 0.8);
+const ambient = new THREE.AmbientLight(0x1a6040, 0.8);
 scene.add(ambient);
-const dirLight = new THREE.DirectionalLight(0x88bbff, 1.0);
+const dirLight = new THREE.DirectionalLight(0x66ddbb, 1.0);
 dirLight.position.set(5, 10, 7);
 scene.add(dirLight);
 const fillLight = new THREE.DirectionalLight(0x1af0b8, 0.2);
@@ -44,7 +43,7 @@ const starCount = 2000;
 const positions = new Float32Array(starCount * 3);
 for (let i = 0; i < starCount * 3; i++) positions[i] = (Math.random() - 0.5) * 200;
 stars.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-const starMat = new THREE.PointsMaterial({ color: 0x4488ff, size: 0.15, transparent: true, opacity: 0.4 });
+const starMat = new THREE.PointsMaterial({ color: 0x33cc99, size: 0.15, transparent: true, opacity: 0.4 });
 const starField = new THREE.Points(stars, starMat);
 scene.add(starField);
 

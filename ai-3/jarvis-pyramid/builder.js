@@ -24,24 +24,26 @@ function buildPyramid(pyramidData) {
 
     function placeNode(folder, cx, cy, cz) {
         const labelDiv = document.createElement('div');
-        labelDiv.className = 'folder-label';
+        const recent = folder.recent || 99;
+        const recentClass = recent <= 5 ? ' recent-high' : '';
+        labelDiv.className = 'folder-label' + recentClass;
         labelDiv.dataset.platform = folder.platform || 'wsl';
         const icons = {
-            rust: '<svg viewBox="0 0 16 16" width="10" height="10"><circle cx="8" cy="8" r="5" fill="none" stroke="#ce422b" stroke-width="1.2"/><circle cx="6" cy="6" r="0.8" fill="#ce422b"/><circle cx="10" cy="6" r="0.8" fill="#ce422b"/><path d="M5 11 Q8 13 11 11" fill="none" stroke="#ce422b" stroke-width="0.8"/><path d="M3 6 L1 4 M5 5 L3 3 M11 5 L13 3 M13 6 L15 4 M4 10 L2 12 M12 10 L14 12" stroke="#ce422b" stroke-width="0.6"/></svg>',
-            nextjs: '<svg viewBox="0 0 16 16" width="10" height="10"><circle cx="8" cy="8" r="7" fill="#111"/><text x="8" y="11" text-anchor="middle" fill="#fff" font-size="8" font-weight="bold">N</text></svg>',
-            vite: '<svg viewBox="0 0 16 16" width="10" height="10"><polygon points="8,1 15,14 1,14" fill="none" stroke="#646cff" stroke-width="1.2"/><text x="8" y="12" text-anchor="middle" fill="#646cff" font-size="7" font-weight="bold">V</text></svg>',
-            react: '<svg viewBox="0 0 16 16" width="10" height="10"><circle cx="8" cy="8" r="1.5" fill="#61dafb"/><ellipse cx="8" cy="8" rx="6" ry="2.5" fill="none" stroke="#61dafb" stroke-width="0.8"/><ellipse cx="8" cy="8" rx="6" ry="2.5" fill="none" stroke="#61dafb" stroke-width="0.8" transform="rotate(60 8 8)"/><ellipse cx="8" cy="8" rx="6" ry="2.5" fill="none" stroke="#61dafb" stroke-width="0.8" transform="rotate(-60 8 8)"/></svg>',
-            python: '<svg viewBox="0 0 16 16" width="10" height="10"><path d="M5 1h6v3H5z" fill="#3776ab"/><path d="M11 4h2v5H5v2H3V4h2z" fill="#3776ab"/><path d="M11 11V8H5V6h6l2 2v3z" fill="#ffd43b"/><circle cx="4" cy="3" r="0.5" fill="#fff"/><circle cx="12" cy="12" r="0.5" fill="#fff"/></svg>',
-            html: '<svg viewBox="0 0 16 16" width="10" height="10"><polygon points="2,1 14,1 12.5,13 8,15 3.5,13" fill="none" stroke="#e44d26" stroke-width="1"/><text x="8" y="11" text-anchor="middle" fill="#e44d26" font-size="6" font-weight="bold">5</text></svg>',
-            node: '<svg viewBox="0 0 16 16" width="10" height="10"><polygon points="8,1 14,4.5 14,11.5 8,15 2,11.5 2,4.5" fill="none" stroke="#83cd29" stroke-width="1"/><text x="8" y="11" text-anchor="middle" fill="#83cd29" font-size="7" font-weight="bold">n</text></svg>',
-            three: '<svg viewBox="0 0 16 16" width="10" height="10"><polygon points="8,1 15,12 1,12" fill="none" stroke="#049ef4" stroke-width="1"/><text x="8" y="11" text-anchor="middle" fill="#049ef4" font-size="6">3</text></svg>',
-            playwright: '<svg viewBox="0 0 16 16" width="10" height="10"><rect x="2" y="4" width="12" height="8" rx="1" fill="none" stroke="#45ba4b" stroke-width="1"/><circle cx="8" cy="8" r="2" fill="none" stroke="#45ba4b" stroke-width="0.8"/><circle cx="5" cy="6.5" r="0.6" fill="#45ba4b"/><circle cx="11" cy="6.5" r="0.6" fill="#45ba4b"/></svg>',
-            electron: '<svg viewBox="0 0 16 16" width="10" height="10"><circle cx="8" cy="8" r="2" fill="none" stroke="#47848f" stroke-width="0.8"/><ellipse cx="8" cy="8" rx="5.5" ry="2" fill="none" stroke="#47848f" stroke-width="0.6"/><ellipse cx="8" cy="8" rx="5.5" ry="2" fill="none" stroke="#47848f" stroke-width="0.6" transform="rotate(60 8 8)"/><ellipse cx="8" cy="8" rx="5.5" ry="2" fill="none" stroke="#47848f" stroke-width="0.6" transform="rotate(-60 8 8)"/></svg>',
-            unknown: '<svg viewBox="0 0 16 16" width="10" height="10"><circle cx="8" cy="8" r="5" fill="none" stroke="#556" stroke-width="1"/></svg>',
+            rust: '<svg viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="8" r="6" fill="#ce422b"/><circle cx="6" cy="6" r="0.8" fill="#fff"/><circle cx="10" cy="6" r="0.8" fill="#fff"/><path d="M5 11 Q8 12.5 11 11" fill="none" stroke="#fff" stroke-width="0.6"/><path d="M3 5 L1 3 M5 4 L3 2 M11 4 L13 2 M13 5 L15 3 M4 9 L2 11 M12 9 L14 11" stroke="#fff" stroke-width="0.5"/></svg>',
+            nextjs: '<svg viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="8" r="7" fill="#111"/><text x="8" y="11" text-anchor="middle" fill="#fff" font-size="8" font-weight="bold">N</text></svg>',
+            vite: '<svg viewBox="0 0 16 16" width="14" height="14"><polygon points="8,1 15,14 1,14" fill="#646cff"/><text x="8" y="12" text-anchor="middle" fill="#fff" font-size="7" font-weight="bold">V</text></svg>',
+            react: '<svg viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="8" r="2" fill="#61dafb"/><ellipse cx="8" cy="8" rx="6.5" ry="2.5" fill="#61dafb" opacity="0.4"/><ellipse cx="8" cy="8" rx="6.5" ry="2.5" fill="#61dafb" opacity="0.4" transform="rotate(60 8 8)"/><ellipse cx="8" cy="8" rx="6.5" ry="2.5" fill="#61dafb" opacity="0.4" transform="rotate(-60 8 8)"/></svg>',
+            python: '<svg viewBox="0 0 16 16" width="14" height="14"><path d="M5 1h6v3H5z" fill="#3776ab"/><path d="M11 4h2v5H5v2H3V4h2z" fill="#3776ab"/><path d="M11 11V8H5V6h6l2 2v3z" fill="#ffd43b"/><circle cx="4" cy="3" r="0.5" fill="#fff"/><circle cx="12" cy="12" r="0.5" fill="#fff"/></svg>',
+            html: '<svg viewBox="0 0 16 16" width="14" height="14"><polygon points="2,1 14,1 12.5,13 8,15 3.5,13" fill="#e44d26"/><text x="8" y="11" text-anchor="middle" fill="#fff" font-size="6" font-weight="bold">5</text></svg>',
+            node: '<svg viewBox="0 0 16 16" width="14" height="14"><polygon points="8,1 14,4.5 14,11.5 8,15 2,11.5 2,4.5" fill="#83cd29"/><text x="8" y="11" text-anchor="middle" fill="#fff" font-size="7" font-weight="bold">n</text></svg>',
+            three: '<svg viewBox="0 0 16 16" width="14" height="14"><polygon points="8,1 15,12 1,12" fill="#049ef4"/><text x="8" y="11" text-anchor="middle" fill="#fff" font-size="6" font-weight="bold">3</text></svg>',
+            playwright: '<svg viewBox="0 0 16 16" width="14" height="14"><rect x="2" y="4" width="12" height="8" rx="1.5" fill="#45ba4b"/><circle cx="8" cy="8" r="2" fill="#fff"/><circle cx="5" cy="6.5" r="0.6" fill="#fff"/><circle cx="11" cy="6.5" r="0.6" fill="#fff"/></svg>',
+            electron: '<svg viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="8" r="2.5" fill="#47848f"/><ellipse cx="8" cy="8" rx="6" ry="2" fill="none" stroke="#47848f" stroke-width="0.8"/><ellipse cx="8" cy="8" rx="6" ry="2" fill="none" stroke="#47848f" stroke-width="0.8" transform="rotate(60 8 8)"/><ellipse cx="8" cy="8" rx="6" ry="2" fill="none" stroke="#47848f" stroke-width="0.8" transform="rotate(-60 8 8)"/></svg>',
+            unknown: '<svg viewBox="0 0 16 16" width="14" height="14"><circle cx="8" cy="8" r="5" fill="#556"/><text x="8" y="11" text-anchor="middle" fill="#fff" font-size="7" font-weight="bold">?</text></svg>',
         };
         const platIcons = {
-            win: '<svg viewBox="0 0 16 16" width="7" height="7" style="margin-left:3px"><rect x="1" y="1" width="6" height="6" fill="#00aaff"/><rect x="9" y="1" width="6" height="6" fill="#00aaff"/><rect x="1" y="9" width="6" height="6" fill="#00aaff"/><rect x="9" y="9" width="6" height="6" fill="#00aaff"/></svg>',
-            wsl: '<svg viewBox="0 0 16 16" width="7" height="7" style="margin-left:3px"><circle cx="8" cy="8" r="6" fill="none" stroke="#ff8800" stroke-width="1.5"/><circle cx="8" cy="8" r="1.5" fill="#ff8800"/><circle cx="4" cy="5" r="1" fill="#ff8800"/><circle cx="12" cy="5" r="1" fill="#ff8800"/><circle cx="8" cy="12" r="1" fill="#ff8800"/></svg>',
+            win: '<svg viewBox="0 0 16 16" width="9" height="9" style="margin-left:3px"><rect x="1" y="1" width="6" height="6" fill="#00aaff"/><rect x="9" y="1" width="6" height="6" fill="#00aaff"/><rect x="1" y="9" width="6" height="6" fill="#00aaff"/><rect x="9" y="9" width="6" height="6" fill="#00aaff"/></svg>',
+            wsl: '<svg viewBox="0 0 16 16" width="9" height="9" style="margin-left:3px"><circle cx="8" cy="8" r="6" fill="#ff8800"/><circle cx="8" cy="8" r="1.5" fill="#fff"/><circle cx="4" cy="5" r="1" fill="#fff"/><circle cx="12" cy="5" r="1" fill="#fff"/><circle cx="8" cy="12" r="1" fill="#fff"/></svg>',
         };
         const iconSvg = icons[folder.tech] || '';
         const platSvg = platIcons[folder.platform] || '';
@@ -50,24 +52,62 @@ function buildPyramid(pyramidData) {
         label.position.set(cx, cy, cz);
         scene.add(label);
 
+        const ghostR = recent <= 5 ? 5.0 : 4.0;
         const ghostMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false });
-        const ghost = new THREE.Mesh(new THREE.SphereGeometry(1.5, 12, 12), ghostMat);
+        const ghost = new THREE.Mesh(new THREE.SphereGeometry(ghostR, 12, 12), ghostMat);
         ghost.position.set(cx, cy, cz);
         ghost.userData = { text: folder.folder, folder: folder.folder, status: folder.status, description: folder.description, isCore: true, label: label };
         scene.add(ghost);
+
+        // Glow halo sprite for recent top 5
+        if (recent <= 5) {
+            const haloCanvas = document.createElement('canvas');
+            haloCanvas.width = 128;
+            haloCanvas.height = 128;
+            const hctx = haloCanvas.getContext('2d');
+            const grad = hctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+            grad.addColorStop(0, 'rgba(0,255,160,0.25)');
+            grad.addColorStop(0.3, 'rgba(0,255,160,0.08)');
+            grad.addColorStop(0.6, 'rgba(0,255,160,0.02)');
+            grad.addColorStop(1, 'rgba(0,0,0,0)');
+            hctx.fillStyle = grad;
+            hctx.fillRect(0, 0, 128, 128);
+            const haloMat = new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(haloCanvas), blending: THREE.AdditiveBlending, transparent: true, opacity: 0.8, depthWrite: false });
+            const halo = new THREE.Sprite(haloMat);
+            halo.scale.set(12, 12, 1);
+            halo.position.set(cx, cy, cz);
+            scene.add(halo);
+            if (!window.__recentHalos) window.__recentHalos = [];
+            window.__recentHalos.push(halo);
+            ghost.userData.halo = halo;
+        }
         clickables.push(ghost);
         draggables.push(ghost);
         allSearchableNodes.push(ghost);
 
         const features = folder.features || [];
         const featCount = features.length;
-        const featRadius = 4.5;
         const childFeatures = [];
-        features.forEach((feat, fi) => {
-            const angle = (fi / featCount) * Math.PI * 2;
-            const fx = cx + Math.cos(angle) * featRadius;
-            const fz = cz + Math.sin(angle) * featRadius;
-            const fy = cy + 0.1;
+        // Arrange features in a pyramid below the node
+        const rows = Math.ceil(Math.sqrt(featCount));
+        const colsPerRow = [];
+        let remaining = featCount;
+        for (let r = 0; r < rows; r++) {
+            const cols = Math.ceil(remaining / (rows - r));
+            colsPerRow.push(cols);
+            remaining -= cols;
+        }
+        let fi = 0;
+        for (let r = 0; r < rows; r++) {
+            const cols = colsPerRow[r];
+            const rowRadius = 3 + r * 4;
+            const rowY = cy - 3 - r * 2.5;
+            for (let c = 0; c < cols && fi < featCount; c++, fi++) {
+                const feat = features[fi];
+                const offset = cols <= 1 ? 0 : (c / (cols - 1) - 0.5);
+                const fx = cx + offset * rowRadius;
+                const fz = cz + 0.5 + r * 0.6;
+                const fy = rowY;
 
             const featColor = feat.status === 'fail' ? 0xff4433 : 0x1af0b8;
             const glowCanvas = document.createElement('canvas');
@@ -120,13 +160,14 @@ function buildPyramid(pyramidData) {
             const lineMat = new THREE.LineBasicMaterial({
                 color: featColor,
                 transparent: true,
-                opacity: 0.08,
+                opacity: 0.04,
             });
             const line = new THREE.Line(lineGeo, lineMat);
             scene.add(line);
             allLines.push(line);
             featureMesh.userData.line = line;
-        });
+            }
+        }
         // Hide features by default
         childFeatures.forEach(f => { f.visible = false; if (f.userData.label) f.userData.label.visible = false; if (f.userData.line) f.userData.line.visible = false; });
         ghost.userData.childFeatures = childFeatures;
@@ -160,19 +201,21 @@ function buildPyramid(pyramidData) {
 
 let selectedProject = null;
 
+function getSelectedProject() { return selectedProject; }
+
 function toggleProject(ghost) {
     // Close previous
     if (selectedProject && selectedProject !== ghost) {
         const prev = selectedProject.userData.childFeatures || [];
-        prev.forEach(f => { f.visible = false; if (f.userData.label) f.userData.label.visible = false; if (f.userData.line) f.userData.line.visible = false; });
+        prev.forEach(f => { f.visible = false; if (f.userData.label) { f.userData.label.visible = false; f.userData.label.element.style.display = 'none'; } if (f.userData.line) f.userData.line.visible = false; });
         selectedProject.userData.expanded = false;
     }
     // Toggle current
     const features = ghost.userData.childFeatures || [];
     const willExpand = !ghost.userData.expanded;
-    features.forEach(f => { f.visible = willExpand; if (f.userData.label) f.userData.label.visible = willExpand; if (f.userData.line) f.userData.line.visible = willExpand; });
+    features.forEach(f => { f.visible = willExpand; if (f.userData.label) { f.userData.label.visible = willExpand; f.userData.label.element.style.display = willExpand ? '' : 'none'; } if (f.userData.line) f.userData.line.visible = willExpand; });
     ghost.userData.expanded = willExpand;
     selectedProject = willExpand ? ghost : null;
 }
 
-export { buildPyramid, toggleProject };
+export { buildPyramid, toggleProject, getSelectedProject };
