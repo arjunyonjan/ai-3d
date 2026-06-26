@@ -138,6 +138,35 @@
             0%, 100% { opacity: 0.2; }
             50% { opacity: 0.8; }
         }
+
+        /* Processing bridge — between STT and TTS */
+        #stt-hologram.processing .stt-ring {
+            border-color: rgba(255, 170, 51, 0.15);
+            animation: ring-expand 4s ease-out infinite;
+        }
+        #stt-hologram.processing .stt-orbit-dot {
+            animation: dot-orbit 5s linear infinite;
+            width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px;
+        }
+        #stt-hologram.processing .stt-orbit-dot:nth-child(1) { --oc: #ffaa33; animation-delay: 0s; }
+        #stt-hologram.processing .stt-orbit-dot:nth-child(2) { --oc: #ffcc44; animation-delay: 1.25s; }
+        #stt-hologram.processing .stt-orbit-dot:nth-child(3) { --oc: #ff8833; animation-delay: 2.5s; }
+        #stt-hologram.processing .stt-orbit-dot:nth-child(4) { --oc: #ffaa44; animation-delay: 3.75s; }
+        #stt-hologram.processing .stt-wave-bar {
+            background: rgba(255, 170, 51, 0.3);
+            box-shadow: 0 0 6px rgba(255, 170, 51, 0.15);
+            animation: none;
+            transform: scaleY(0.2);
+        }
+        #stt-hologram.processing .stt-label {
+            color: rgba(255, 170, 51, 0.4);
+            animation: think-pulse 2.5s ease-in-out infinite;
+        }
+        @keyframes think-pulse {
+            0%, 100% { opacity: 0.15; letter-spacing: 3px; }
+            50% { opacity: 0.6; letter-spacing: 5px; }
+        }
+
         /* STT Speech Preview */
         #stt-preview {
             position: fixed; top: 130px; left: 50%; transform: translateX(-50%);

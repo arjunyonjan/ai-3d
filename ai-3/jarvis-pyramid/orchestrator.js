@@ -305,7 +305,11 @@ async function fetchReasonSSE(text) {
                     if (line.startsWith('data: ')) {
                         try {
                             const data = JSON.parse(line.slice(6));
+                            if (data.status === 'processing') {
+                                showProcessing();
+                            }
                             if (data.status === 'speaking') {
+                                sttCleanup();
                                 showSpeakingIndicator(data.reply, data.duration * 1000);
                                 window.__scheduleSpeakingEnd(data.duration * 1000);
                             }
@@ -356,11 +360,28 @@ function onVoiceLevel(level) {
     }
 }
 
+function showProcessing() {
+    const holo = document.getElementById('stt-hologram');
+    const label = holo?.querySelector('.stt-label');
+    if (holo) {
+        holo.classList.add('processing');
+        holo.classList.remove('active');
+        holo.style.display = 'block';
+    }
+    if (label) label.textContent = 'THINKING';
+}
+
 function sttCleanup() {
     const btn = document.getElementById('stt-btn');
     const holo = document.getElementById('stt-hologram');
+    const label = holo?.querySelector('.stt-label');
     if (btn) btn.classList.remove('listening');
-    if (holo) holo.classList.remove('active');
+    if (holo) {
+        holo.classList.remove('active');
+        holo.classList.remove('processing');
+        holo.style.display = '';
+    }
+    if (label) label.textContent = 'LISTENING';
     document.querySelectorAll('.stt-wave-bar').forEach(b => b.style.transform = 'scaleY(0.15)');
 }
 
@@ -376,6 +397,7 @@ function wireSTT() {
                 showSpeechPreview(text);
                 const vlCb = document.getElementById('dev-voice-loop');
                 if (!vlCb || vlCb.checked) {
+                    showProcessing();
                     fetchReasonSSE(text);
                 }
                 const intent = matchIntent(text);
