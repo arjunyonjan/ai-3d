@@ -129,18 +129,6 @@ document.querySelectorAll('.vt-btn').forEach(btn => {
     });
 });
 
-setTimeout(() => {
-    const ai3 = cls.find(c => c.userData.folder === 'AI-3');
-    if (!ai3) return;
-    const el = ai3.userData.label?.element;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) return;
-    const x = rect.left + rect.width / 2;
-    const y = rect.top + rect.height / 2;
-    renderer.domElement.dispatchEvent(new MouseEvent('click', { clientX: x, clientY: y, bubbles: true }));
-}, 1200);
-
 document.getElementById('back-view').addEventListener('click', () => {
     exitIsolation(webLines);
 });
