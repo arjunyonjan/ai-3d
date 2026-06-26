@@ -166,10 +166,12 @@ function animate() {
     }
     cls.forEach(dot => {
         if (dot.userData.isFeature) {
+            const sprite = dot.userData.targetSprite;
+            if (!sprite) return;
             const pulse = 0.6 + 0.4 * (Math.sin(t * 1.5 + dot.id) * 0.5 + 0.5);
-            dot.material.opacity = pulse;
+            sprite.material.opacity = pulse;
             const s = 0.4 + 0.2 * (Math.sin(t * 1.5 + dot.id) * 0.5 + 0.5);
-            dot.scale.set(s, s, 1);
+            sprite.scale.set(s, s, 1);
         }
     });
     tickCameraAnimation();
