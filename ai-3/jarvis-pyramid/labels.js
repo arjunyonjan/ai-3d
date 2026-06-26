@@ -21,9 +21,9 @@ export const platIcons = {
 
 export function createLabel(folder, recentClass) {
     const div = document.createElement('div');
-    div.className = 'folder-label' + recentClass;
+    div.className = 'folder-label' + recentClass + ' tech-' + (folder.tech || 'unknown');
     div.dataset.platform = folder.platform || 'wsl';
-    div.innerHTML = `${icons[folder.tech] || ''} ${folder.folder}${platIcons[folder.platform] || ''}`;
+    div.innerHTML = `<span class="tech-dot"></span>${icons[folder.tech] || ''} ${folder.folder}${platIcons[folder.platform] || ''}`;
     return div;
 }
 
