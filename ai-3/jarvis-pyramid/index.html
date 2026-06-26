@@ -52,6 +52,7 @@
             text-shadow: 0 0 15px currentColor, 0 0 30px currentColor;
             border-radius: 2px; border-bottom: 1px solid currentColor;
         }
+        .feature-label .feat-icon { font-size: 0.65rem; margin-right: 2px; }
         .feature-label.success { color: #00e5ff; border-color: rgba(0, 229, 255, 0.3); }
         .feature-label.fail { color: #ff0022; border-color: rgba(255, 0, 34, 0.3); }
         #legend {
@@ -87,6 +88,27 @@
             border-radius: 6px; background: rgba(10, 18, 30, 0.5);
         }
         #back-view:hover { color: #00ffa0; background: rgba(0, 255, 160, 0.1); }
+
+        /* Dev Panel */
+        #dev-btn {
+            position: fixed; bottom: 16px; right: 16px; z-index: 100;
+            background: rgba(0,255,160,0.1); border: 1px solid rgba(0,255,160,0.3);
+            color: #00ffa0; font-family: monospace; font-size: 0.55rem;
+            padding: 4px 10px; border-radius: 4px; cursor: pointer;
+            letter-spacing: 1.5px; text-transform: uppercase;
+        }
+        #dev-btn:hover { background: rgba(0,255,160,0.2); }
+        #dev-panel {
+            position: fixed; bottom: 44px; right: 16px; z-index: 100;
+            background: rgba(10,20,16,0.92); border: 1px solid rgba(0,255,160,0.2);
+            border-radius: 6px; padding: 12px 16px; min-width: 180px;
+            display: none; font-family: monospace; font-size: 0.6rem;
+        }
+        #dev-panel.open { display: block; }
+        #dev-panel label { display: flex; align-items: center; gap: 8px; color: #c0dcd0; cursor: pointer; padding: 3px 0; }
+        #dev-panel input[type="checkbox"] { accent-color: #00ffa0; }
+        #dev-panel .dev-title { color: rgba(0,255,160,0.5); font-size: 0.5rem; letter-spacing: 2px; margin-bottom: 6px; text-transform: uppercase; }
+        #dev-fps-display { position: fixed; top: 16px; right: 16px; z-index: 100; color: rgba(0,255,160,0.4); font-family: monospace; font-size: 0.55rem; display: none; }
     </style>
 </head>
 <body>
@@ -99,6 +121,16 @@
     <div id="search-wrapper"><input type="text" id="search-input" placeholder="SEARCH MEMORY MAP..." /></div>
     <div id="back-view" style="display:none">← BACK</div>
     <div id="legend"><span class="y"></span> PROJECT <span class="g"></span> SUCCESS <span class="r"></span> FAILURE</div>
+    <div id="dev-fps-display">0 FPS</div>
+    <div id="dev-btn">DEV</div>
+    <div id="dev-panel">
+        <div class="dev-title">debug</div>
+        <label><input type="checkbox" id="dev-hitbox" /> Show hitboxes</label>
+        <label><input type="checkbox" id="dev-feat-hitbox" /> Show feature hitboxes</label>
+        <label><input type="checkbox" id="dev-laser" /> Raycaster laser</label>
+        <label><input type="checkbox" id="dev-followers" /> Follower lines</label>
+        <label><input type="checkbox" id="dev-fps" /> FPS counter</label>
+    </div>
 
 
     <script type="importmap">

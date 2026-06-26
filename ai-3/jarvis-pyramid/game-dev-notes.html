@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game Dev Notes — JARVIS Pyramid</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0; padding: 40px;
+            background: #0a1410;
+            color: #c0dcd0;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+        }
+        h1 { color: #00ffa0; font-weight: 500; letter-spacing: 2px; font-size: 3.5rem; margin-bottom: 0; }
+        h2 { color: #1af0b8; font-weight: 400; font-size: 2.5rem; margin-top: 50px; border-bottom: 2px solid rgba(0,255,160,0.15); padding-bottom: 8px; letter-spacing: 1px; display: flex; align-items: center; gap: 16px; }
+        h2 svg { flex-shrink: 0; }
+        h3 { color: #66ddbb; font-weight: 400; font-size: 1.8rem; margin-top: 30px; letter-spacing: 1px; }
+        .subtitle { color: rgba(160,196,212,0.5); font-size: 1rem; letter-spacing: 4px; margin-bottom: 40px; margin-top: 8px; }
+        .layman { color: #a0d4c0; font-size: 1rem; background: rgba(0,255,160,0.04); padding: 16px 20px; border-radius: 8px; border-left: 4px solid #00ffa0; margin: 16px 0; }
+        .layman strong { color: #00ffa0; }
+        .examples { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0 20px 0; }
+        .example { background: rgba(0,0,0,0.3); padding: 12px 16px; border-radius: 6px; border-left: 2px solid rgba(0,255,160,0.2); }
+        .example .num { color: rgba(0,255,160,0.4); font-size: 0.6rem; letter-spacing: 2px; margin-right: 8px; }
+        code { background: rgba(0,255,160,0.08); color: #00ffa0; padding: 1px 6px; border-radius: 3px; font-size: 0.75rem; }
+        pre { background: rgba(0,0,0,0.4); padding: 12px 16px; border-radius: 6px; border-left: 3px solid #00ffa0; overflow-x: auto; font-size: 0.75rem; color: #a0d4c0; }
+        .tag { display: inline-block; background: rgba(0,255,160,0.1); color: #00ffa0; padding: 1px 8px; border-radius: 10px; font-size: 0.6rem; letter-spacing: 1px; margin-right: 4px; }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 4px; }
+        hr { border: none; border-top: 1px solid rgba(0,255,160,0.08); margin: 30px 0; }
+        .gloss-term { color: #00ffa0; font-size: 1.2rem; }
+    </style>
+</head>
+<body>
+    <h1>🎮 GAME DEV NOTES</h1>
+    <div class="subtitle">Three.js techniques used in the JARVIS Memory Pyramid</div>
+
+    <!-- ============================================================ -->
+    <h2><svg viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="#00ffa0" stroke-width="1.5"><circle cx="16" cy="16" r="7"/><line x1="16" y1="4" x2="16" y2="9"/><line x1="16" y1="23" x2="16" y2="28"/><line x1="4" y1="16" x2="9" y2="16"/><line x1="23" y1="16" x2="28" y2="16"/><circle cx="16" cy="16" r="2" fill="#00ffa0"/></svg> 1. HITBOX</h2>
+    <div class="layman">
+        <strong>Layman meaning:</strong> An invisible box or ball attached to a thing. When you click, the game checks if your click touched this invisible shape — not the visible art.
+    </div>
+    <div class="examples">
+        <div class="example"><span class="num">①</span> A character in a fighting game has a visible body, but the <strong>hitbox</strong> is an invisible rectangle around the torso. Punches check the hitbox, not the pixels.</div>
+        <div class="example"><span class="num">②</span> A button on a website looks like a rounded rectangle, but the browser's <strong>hitbox</strong> is the rectangular clickable area. Click outside it = nothing happens.</div>
+        <div class="example"><span class="num">③</span> In a car racing game, each car has a hidden <strong>hitbox</strong> box around it. When two boxes overlap = crash. The visual car model can have spikes or wings that don't affect collision.</div>
+        <div class="example"><span class="num">④</span> A light switch on the wall has a small plastic toggle, but the <strong>hitbox</strong> is a larger rectangle behind it. You don't need to perfectly hit the tiny switch — the game helps you.</div>
+        <div class="example"><span class="num">⑤</span> In the JARVIS pyramid, folder labels are HTML text, but the <strong>hitbox</strong> is a hidden 3D box behind them. The click feels natural because the invisible box matches the text size exactly.</div>
+    </div>
+    <p>CSS2D labels are HTML overlays — Three.js <code>Raycaster</code> cannot detect them. Solution: spawn invisible 3D meshes ("ghosts") at the same position.</p>
+    <ul>
+        <li><span class="tag">FOLDER</span> <code>BoxGeometry(w, h, 0.3)</code> — size computed from actual label pixels ÷ camera projection</li>
+        <li><span class="tag">FEATURE</span> <code>BoxGeometry(2.5, 1.5, 0.3)</code> — fixed size for feature rows</li>
+        <li>Material: <code>MeshBasicMaterial({ opacity: 0, depthTest: false })</code> — fully invisible, no z-fighting</li>
+    </ul>
+
+    <!-- ============================================================ -->
+    <h2><svg viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="#00ffa0" stroke-width="1.5"><line x1="4" y1="28" x2="14" y2="18"/><line x1="14" y1="18" x2="14" y2="12"/><polyline points="14,12 20,12 20,6"/><circle cx="24" cy="8" r="4" fill="#00ffa0" opacity="0.3"/></svg> 2. RAYCASTER</h2>
+    <div class="layman">
+        <strong>Layman meaning:</strong> A virtual laser beam shot from the camera (your eyes) through the mouse position into the 3D world. Whatever it hits first gets clicked.
+    </div>
+    <div class="examples">
+        <div class="example"><span class="num">①</span> Point a laser pointer at a wall of toys. The first toy the laser dot lands on is the one you "clicked." That's the <strong>raycaster</strong>.</div>
+        <div class="example"><span class="num">②</span> In an FPS game, when you aim down sights and shoot, the game fires a <strong>ray</strong> from your gun barrel forward. The first enemy the ray hits takes damage — even if they're far away.</div>
+        <div class="example"><span class="num">③</span> In a strategy game, clicking on the ground sends a <strong>ray</strong> from camera through the mouse. Where it hits the ground plane = the move-to position for your unit.</div>
+        <div class="example"><span class="num">④</span> A barcode scanner at a supermarket shoots a red <strong>laser</strong> (ray). It reads the first barcode it hits. Same idea — shoot, detect, return the first match.</div>
+        <div class="example"><span class="num">⑤</span> In JARVIS pyramid, clicking dispatches a <strong>ray</strong> from the camera through your mouse position. It tests every invisible hitbox and returns the nearest one. That's how we know you clicked "AI-3" and not something behind it.</div>
+    </div>
+    <p>Converts mouse screen position → 3D ray → tests intersection with ghost meshes.</p>
+    <pre>renderer.domElement.addEventListener('click', (e) => {
+  pointer.x = (e.clientX / w) * 2 - 1;
+  pointer.y = -(e.clientY / h) * 2 + 1;
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObjects(cls);
+  if (hits.length) toggleProject(hits[0].object);
+});</pre>
+
+    <!-- ============================================================ -->
+    <h2><svg viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="#00ffa0" stroke-width="1.5"><circle cx="6" cy="6" r="3"/><circle cx="26" cy="26" r="3"/><path d="M9 9 Q16 6 23 23" stroke-dasharray="2 2"/><path d="M9 9 Q16 20 23 23"/></svg> 3. LERP</h2>
+    <div class="layman">
+        <strong>Layman meaning:</strong> Short for "linear interpolation." It means smoothly moving from point A to point B over time — like sliding a volume knob instead of snapping it.
+    </div>
+    <div class="examples">
+        <div class="example"><span class="num">①</span> A sliding door: instead of vanishing and reappearing at the other end, it <strong>slides</strong> smoothly from open to closed. That slide is a lerp.</div>
+        <div class="example"><span class="num">②</span> An elevator going from floor 3 to floor 7: it doesn't teleport. It <strong>lerps</strong> upward over 3 seconds, passing every floor in between.</div>
+        <div class="example"><span class="num">③</span> Fading a light from 0% to 100% brightness: the dimmer switch <strong>lerps</strong> the voltage — smooth, not a sudden on/off.</div>
+        <div class="example"><span class="num">④</span> In a cutscene, the camera <strong>lerps</strong> from a wide shot to a close-up over 2 seconds. Your eyes follow naturally instead of jumping.</div>
+        <div class="example"><span class="num">⑤</span> In JARVIS pyramid, when you click a project, the camera <strong>lerps</strong> from its current position to a close-up over 1 second using a cubic ease curve. It doesn't teleport — it flies there smoothly.</div>
+    </div>
+    <p>Smooth camera transitions using <code>lerpVectors</code> with cubic ease-out: <code>1 - (1 - t)³</code>.</p>
+    <pre>const ease = 1 - Math.pow(1 - p, 3);
+camera.position.lerpVectors(_from, _to, ease);
+orbitControls.target.lerpVectors(_targetFrom, _targetTo, ease);</pre>
+
+    <!-- ============================================================ -->
+    <h2><svg viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="#00ffa0" stroke-width="1.5"><rect x="5" y="7" width="22" height="18" rx="2"/><path d="M5 20 L12 13 L17 18 L22 11 L27 17"/><rect x="5" y="7" width="22" height="18" rx="2" opacity="0.15"/></svg> 4. SPRITE</h2>
+    <div class="layman">
+        <strong>Layman meaning:</strong> A flat image that always faces the camera. No matter how you rotate the 3D world, the sprite turns to stare at you — like a cardboard cutout on a rotating platform.
+    </div>
+    <div class="examples">
+        <div class="example"><span class="num">①</span> A cardboard cutout of a celebrity at a movie theater — it's flat, but from the front it looks 3D. If you walk left, it still faces you (it's on a pivot). That's a <strong>sprite</strong>.</div>
+        <div class="example"><span class="num">②</span> In old 2D games (Mario, Sonic), every character was a <strong>sprite</strong> — a flat image that always faced the screen. The game world was 2D, but the sprites felt alive.</div>
+        <div class="example"><span class="num">③</span> Health bars floating above character heads in games: they're <strong>sprites</strong> that always face your camera so you can read them from any angle.</div>
+        <div class="example"><span class="num">④</span> A glowing light bulb in a 3D scene: instead of modeling the glass and filament, use a bright circular <strong>sprite</strong> that always faces you. Same visual, zero geometry cost.</div>
+        <div class="example"><span class="num">⑤</span> In JARVIS pyramid, the glowing green halos around the top 5 recent projects are <strong>sprites</strong> — 128×128 radial gradient images that always face the camera. They pulse, glow, and cost almost no GPU power.</div>
+    </div>
+    <p>Camera-facing billboards using <code>CanvasTexture</code> with radial gradients.</p>
+    <ul>
+        <li><span class="tag">HALO</span> 128×128 radial gradient, <code>AdditiveBlending</code>, pulsing opacity 0.6–1.0</li>
+        <li><span class="tag">FEATURE</span> 64×64 radial gradient, red for fail / cyan for success, pulsing + scale oscillation</li>
+    </ul>
+
+    <!-- ============================================================ -->
+    <h2><svg viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="#00ffa0" stroke-width="1.5"><circle cx="13" cy="13" r="7" opacity="0.5"/><circle cx="19" cy="19" r="7" opacity="0.5"/><circle cx="13" cy="13" r="7" stroke="#1af0b8"/><circle cx="19" cy="19" r="7" stroke="#1af0b8"/><circle cx="16" cy="16" r="3" fill="#00ffa0" opacity="0.6"/></svg> 5. ADDITIVE BLENDING</h2>
+    <div class="layman">
+        <strong>Layman meaning:</strong> A glow mode where colors add together. Two overlapping glows become brighter where they meet — like shining two flashlights on the same spot turns it whiter.
+    </div>
+    <div class="examples">
+        <div class="example"><span class="num">①</span> Two flashlights shining on a wall: where both beams overlap, the spot is <strong>brighter</strong> than either alone. That's additive blending — light adds to light.</div>
+        <div class="example"><span class="num">②</span> A neon sign in a dark alley: the glow spills outward. Where two neon tubes cross, the glow is <strong>whiter</strong> because the red and blue light add together.</div>
+        <div class="example"><span class="num">③</span> Photoshop layers set to "Screen" mode: white areas let everything through, black blocks nothing. Overlapping semi-transparent areas get <strong>brighter</strong>. That's additive.</div>
+        <div class="example"><span class="num">④</span> In a dark video game, a lava pool uses additive blending. Where two lava sprites overlap, the orange glow becomes yellow-white — <strong>hotter</strong>, brighter, more intense.</div>
+        <div class="example"><span class="num">⑤</span> In JARVIS pyramid, the green glow halos use <strong>AdditiveBlending</strong>. Where two project nodes are close, their halos merge into a bright cyan hotspot — creating the illusion of connected energy.</div>
+    </div>
+
+    <!-- ============================================================ -->
+    <h2><svg viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="#00ffa0" stroke-width="1.5"><circle cx="16" cy="12" r="6"/><circle cx="12" cy="12" r="1.5" fill="#00ffa0"/><circle cx="20" cy="12" r="1.5" fill="#00ffa0"/><path d="M10 20 Q16 18 22 20" opacity="0.4"/><path d="M12 22 Q16 20 20 22" opacity="0.25"/></svg> 6. GHOST</h2>
+    <div class="layman">
+        <strong>Layman meaning:</strong> An invisible 3D shape that exists purely to detect clicks. You never see it — it's the "ghost" of a visible object, doing the hidden work.
+    </div>
+    <div class="examples">
+        <div class="example"><span class="num">①</span> Invisible walls in video games: you see a beautiful canyon, but there's a <strong>ghost</strong> wall blocking you from walking through a gap. You can't see it, but your character bumps into it.</div>
+        <div class="example"><span class="num">②</span> A motion sensor light: the <strong>ghost</strong> is the invisible cone of detection. When you walk into it — click, light on. The cone isn't visible, only its effect is.</div>
+        <div class="example"><span class="num">③</span> In platformer games, a coin has a <strong>ghost</strong> sphere around it. You don't need to touch the pixel-perfect coin art — just get close enough, and the ghost sphere catches your collision.</div>
+        <div class="example"><span class="num">④</span> A Wi-Fi router broadcasts an <strong>invisible</strong> signal sphere. Your phone connects when it's inside that sphere. The router's plastic shell is visible, but the connection zone is a ghost.</div>
+        <div class="example"><span class="num">⑤</span> In JARVIS pyramid, each folder name text has a <strong>ghost</strong> BoxGeometry behind it. The text is HTML (invisible to 3D raycaster), but the ghost box catches the ray and registers the click.</div>
+    </div>
+
+    <!-- ============================================================ -->
+    <h2><svg viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="#00ffa0" stroke-width="1.5"><circle cx="10" cy="16" r="5"/><circle cx="22" cy="16" r="5"/><line x1="15" y1="12" x2="17" y2="12"/><line x1="15" y1="20" x2="17" y2="20"/><path d="M13 14 L14 13 M13 18 L14 19 M19 14 L18 13 M19 18 L18 19" stroke-width="1"/></svg> 7. DRAG vs CLICK DISAMBIGUATION</h2>
+    <div class="layman">
+        <strong>Layman meaning:</strong> A trick to tell whether the user meant to drag (move something) or click (select something). If your finger moved too far before lifting, it was a drag, not a click.
+    </div>
+    <div class="examples">
+        <div class="example"><span class="num">①</span> On a phone, tapping an app icon opens it. But if you <strong>drag</strong> it slightly, it enters "jiggle mode." The phone checks: did your finger move more than 10px before lifting? If yes, it's a drag, not a tap.</div>
+        <div class="example"><span class="num">②</span> In a file browser, clicking selects the file. Dragging it moves it. The OS tracks your mouse: if you moved more than 4 pixels while the button was down, it switches to drag mode.</div>
+        <div class="example"><span class="num">③</span> A light switch: pressing it down = click. Wiping your hand across multiple switches = drag. The mechanism detects whether your finger stayed in one spot or traveled.</div>
+        <div class="example"><span class="num">④</span> In chess, clicking a piece selects it (highlight). But if you click-and-drag the piece to a square, it moves there. The game waits: did you release without moving (click) or drag to a new square (move)?</div>
+        <div class="example"><span class="num">⑤</span> In JARVIS pyramid, when you pointer-down on a node, it records the XY position. On click (release), if the mouse moved more than 10px, it was a drag — ignore the click. This prevents accidental toggles while dragging nodes around.</div>
+    </div>
+
+    <!-- ============================================================ -->
+    <h2><svg viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="#00ffa0" stroke-width="1.5"><circle cx="10" cy="10" r="4"/><circle cx="22" cy="22" r="4"/><path d="M14 12 Q18 14 20 18"/><path d="M13 13 L16 10 M20 20 L23 17" stroke-width="1.2"/></svg> 8. FOLLOWER PATTERN</h2>
+    <div class="layman">
+        <strong>Layman meaning:</strong> A list of "update my position" instructions stored on each object. When the object moves, it runs through the list and tells everything attached to it to move too.
+    </div>
+    <div class="examples">
+        <div class="example"><span class="num">①</span> A mother duck with ducklings: the mother moves, and each duckling has a built-in "follow mother" instruction. No one tells ducklings individually — they just execute their <strong>follower</strong> behavior.</div>
+        <div class="example"><span class="num">②</span> A train: the engine moves, and each carriage has a coupling that says "follow the thing in front of you." The engine doesn't push each carriage — the couplings (followers) handle it.</div>
+        <div class="example"><span class="num">③</span> A PowerPoint group: if you group 5 shapes and drag the group, all 5 move together. Each shape is a <strong>follower</strong> of the group's position.</div>
+        <div class="example"><span class="num">④</span> A person walking a dog: the leash is the <strong>follower</strong> connection. When the person moves, the dog follows. Different dogs (objects) use the same leash pattern.</div>
+        <div class="example"><span class="num">⑤</span> In JARVIS pyramid, each draggable node stores a list of <strong>_followers</strong>: its label, its glow halo, its feature lines, and its web lines. Drag the node once, and all followers update automatically. No if-else chains per object type.</div>
+    </div>
+
+    <!-- ============================================================ -->
+    <h2><svg viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="#00ffa0" stroke-width="1.5"><circle cx="16" cy="16" r="6"/><line x1="16" y1="16" x2="16" y2="2"/><line x1="16" y1="16" x2="27" y2="21"/><line x1="16" y1="16" x2="5" y2="21"/><line x1="16" y1="16" x2="22" y2="5"/><line x1="16" y1="16" x2="10" y2="5"/></svg> 9. ISOLATION MODE</h2>
+    <div class="layman">
+        <strong>Layman meaning:</strong> "Focus mode." Click an object → everything else disappears, camera zooms in on it. Press BACK → everything returns. Like selecting one file out of 100 and putting the rest in a drawer.
+    </div>
+    <div class="examples">
+        <div class="example"><span class="num">①</span> A museum spotlight: in a dark room, one painting is lit. The others are in shadow. You can only see the selected exhibit. Step back = lights come back on. That's <strong>isolation</strong>.</div>
+        <div class="example"><span class="num">②</span> A police detective's evidence board: they pull one photo off and pin it to a solo board, removing all distractions. Focus on one clue at a time. BACK returns to the full wall.</div>
+        <div class="example"><span class="num">③</span> In a game, selecting a unit in an RTS: all other units dim or the camera follows only that unit. Deselect = all units visible again.</div>
+        <div class="example"><span class="num">④</span> Full-screen mode on a video: the video takes over your entire screen. Everything else hides. Press ESC = your desktop returns. One focus, no distractions.</div>
+        <div class="example"><span class="num">⑤</span> In JARVIS pyramid, click a project node → all other 42 nodes fade out, the selected node's glow shrinks, camera flies close. A BACK button appears. Click it → all nodes restore, camera returns to the overview.</div>
+    </div>
+
+    <!-- ============================================================ -->
+    <h2><svg viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="#00ffa0" stroke-width="1.5"><rect x="4" y="4" width="24" height="8" rx="1"/><rect x="6" y="8" width="20" height="8" rx="1"/><rect x="8" y="12" width="16" height="8" rx="1"/><rect x="10" y="16" width="12" height="8" rx="1"/></svg> 10. Z-DEPTH PUSH (SEARCH FADE)</h2>
+    <div class="layman">
+        <strong>Layman meaning:</strong> When searching, matching items stay close to you; non-matching items get pushed far back and become almost invisible. Like a spotlight on the search results.
+    </div>
+    <div class="examples">
+        <div class="example"><span class="num">①</span> A librarian searching for a book: she pulls matching books to the front of the shelf and pushes non-matching ones to the back. You only see the ones that match your query.</div>
+        <div class="example"><span class="num">②</span> A stage with 50 actors: the director calls "only actors wearing red, step forward." The red-clad actors step toward the spotlight; others step into darkness. Audience sees only red.</div>
+        <div class="example"><span class="num">③</span> Ctrl+F in a browser: matching words get highlighted (yellow). Non-matching text stays normal. The <strong>highlight</strong> = pull forward. Everything else stays put.</div>
+        <div class="example"><span class="num">④</span> A dating app filter: set "age 25-30" → profiles outside that range get pushed to the bottom of the stack. You only swipe through the filtered ones.</div>
+        <div class="example"><span class="num">⑤</span> In JARVIS pyramid, type a search query. Matching projects stay at their original Z position at full opacity. Non-matching ones get pushed 50 units backward and fade to 3% opacity. They're still there but effectively invisible.</div>
+    </div>
+
+    <hr />
+
+    <!-- ============================================================ -->
+    <h2><svg viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="#00ffa0" stroke-width="1.5"><rect x="3" y="6" width="10" height="20" rx="1.5"/><rect x="16" y="6" width="5" height="20" rx="1.5"/><rect x="24" y="6" width="5" height="20" rx="1.5"/><line x1="8" y1="4" x2="8" y2="6"/><line x1="18.5" y1="4" x2="18.5" y2="6"/><line x1="26.5" y1="4" x2="26.5" y2="6"/></svg> ARCHITECTURE FLOW</h2>
+    <pre>index.html
+  ├── core.js        → Scene, camera, renderer, lights, stars, OrbitControls
+  ├── data.js        → 43 projects, MiniFuse search, panel state
+  ├── builder.js     → Build pyramid: placeNode, feature rows, ghosts, halos, sprites
+  ├── orchestrator.js → Events: raycaster, drag controls, isolation, camera anim, search, web lines
+  └── test-isolation.mjs → Playwright test (43 labels, isolation enter/back)</pre>
+
+    <!-- ============================================================ -->
+    <h2><svg viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="#00ffa0" stroke-width="1.5"><text x="16" y="20" text-anchor="middle" fill="#00ffa0" font-size="14" font-weight="bold">#</text><circle cx="16" cy="16" r="11" opacity="0.2"/></svg> KEY NUMBERS</h2>
+    <ul>
+        <li>43 projects total — 14 with features (pyramid) + 29 scattered</li>
+        <li>7 pyramid rings, radius 8 → 32, y 0 → 21</li>
+        <li>Top 5 recent: AI-3, FUCHECODE, FUCHE-TEST, AI-BANK-CHAT, KOKORO-RS</li>
+        <li>Hitbox sizes: folder ~2–5 units wide (dynamic), features 2.5×1.5</li>
+        <li>Camera: 45° FOV, initial pos (55, 35, 65), target (0, 10, 0)</li>
+        <li>Halo: 128px canvas, scale 12 units, AdditiveBlending</li>
+        <li>Ghost depth: 0.3 (thin slab — Z-axis not critical for 3D hitbox)</li>
+    </ul>
+
+    <!-- ============================================================ -->
+    <h2><svg viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="#00ffa0" stroke-width="1.5"><rect x="6" y="8" width="20" height="18" rx="2"/><line x1="10" y1="12" x2="14" y2="12"/><line x1="10" y1="16" x2="18" y2="16"/><line x1="10" y1="20" x2="22" y2="20"/><path d="M6 8 L16 4 L26 8"/></svg> GLOSSARY</h2>
+    <ul>
+        <li><span class="gloss-term">Hitbox</span> — invisible collision volume for click/drag detection (fighting game term, 1990s)</li>
+        <li><span class="gloss-term">Raycaster</span> — laser beam from camera through mouse that finds the clicked object</li>
+        <li><span class="gloss-term">Lerp</span> — smooth slide from A to B over time (not a teleport)</li>
+        <li><span class="gloss-term">Sprite</span> — flat image that always faces the camera (cardboard cutout)</li>
+        <li><span class="gloss-term">AdditiveBlending</span> — glow mode where overlaps get brighter (flashlights on a wall)</li>
+        <li><span class="gloss-term">Ghost</span> — invisible 3D shape that exists only to catch clicks</li>
+        <li><span class="gloss-term">CSS2DObject</span> — HTML label pinned to a 3D position in the scene</li>
+        <li><span class="gloss-term">Follower</span> — a callback stored on each object that updates attached elements on drag</li>
+        <li><span class="gloss-term">Isolation</span> — select one, hide all others, zoom camera in</li>
+        <li><span class="gloss-term">Z-Depth Push</span> — push non-matching items far away during search (fade + depth)</li>
+    </ul>
+
+    <p style="margin-top: 40px; color: rgba(160,196,212,0.3); font-size: 0.6rem; letter-spacing: 2px;">JARVIS Memory Pyramid — Game Dev Techniques Reference</p>
+</body>
+</html>

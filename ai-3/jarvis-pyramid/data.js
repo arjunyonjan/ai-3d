@@ -487,10 +487,6 @@ const pyramidData = [
     "recent": 13,
   }
 ];
-let activePanelData = null;
-let isHumanInteracted = false;
-let autoDemoTimer = null;
-let autoCloseTimer = null;
 
 function miniFuseSearch(query, nodeList) {
     if (!query.trim()) return nodeList;
@@ -517,14 +513,6 @@ function miniFuseSearch(query, nodeList) {
     return results;
 }
 
-function openPanelData(d) {
-    activePanelData = d;
-}
-
-function closePanel() {
-    activePanelData = null;
-}
-
 function getData(mode) {
     if (mode === 'alpha') {
         return [...pyramidData].sort((a, b) => a.folder.localeCompare(b.folder));
@@ -532,10 +520,4 @@ function getData(mode) {
     return pyramidData;
 }
 
-function setHumanInteracted(v) { isHumanInteracted = v; }
-function setAutoDemoTimer(v) { autoDemoTimer = v; }
-function setAutoCloseTimer(v) { autoCloseTimer = v; }
-function clearAutoDemo() { if (autoDemoTimer) { clearTimeout(autoDemoTimer); autoDemoTimer = null; } }
-function clearAutoClose() { if (autoCloseTimer) { clearTimeout(autoCloseTimer); autoCloseTimer = null; } }
-
-export { pyramidData, getData, miniFuseSearch, openPanelData, closePanel, activePanelData, isHumanInteracted, autoDemoTimer, autoCloseTimer, setHumanInteracted, setAutoDemoTimer, setAutoCloseTimer, clearAutoDemo, clearAutoClose };
+export { pyramidData, getData, miniFuseSearch };

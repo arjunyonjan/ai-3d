@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3D Game Dev Demos — JARVIS Pyramid</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0a1410; color: #c0dcd0; font-family: 'JetBrains Mono', monospace; padding: 30px; }
+        h1 { color: #00ffa0; font-size: 2.5rem; letter-spacing: 2px; margin-bottom: 4px; }
+        .subtitle { color: rgba(160,196,212,0.4); font-size: 0.7rem; letter-spacing: 3px; margin-bottom: 30px; }
+        .demo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .demo-card { background: rgba(0,0,0,0.3); border-radius: 10px; border: 1px solid rgba(0,255,160,0.1); overflow: hidden; }
+        .demo-card canvas { display: block; width: 100%; height: 280px; }
+        .demo-header { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: rgba(0,255,160,0.03); border-bottom: 1px solid rgba(0,255,160,0.08); }
+        .demo-num { color: rgba(0,255,160,0.3); font-size: 0.6rem; letter-spacing: 2px; }
+        .demo-title { color: #1af0b8; font-size: 0.75rem; letter-spacing: 1px; }
+        .demo-layman { padding: 8px 16px; color: rgba(160,196,212,0.5); font-size: 0.6rem; border-top: 1px solid rgba(0,255,160,0.05); }
+        @media (max-width: 800px) { .demo-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <h1>🎮 3D DEMOS</h1>
+    <div class="subtitle">Interactive Three.js previews — one per game dev concept</div>
+    <div class="demo-grid" id="demos"></div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { DragControls } from 'three/addons/controls/DragControls.js';
+        import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+        const demos = [
+            // 1. HITBOX
+            { num: '01', title: 'HITBOX', layman: 'Invisible box catches clicks. Click to toggle wireframe.', init: (el) => {
+                const w = el.clientWidth || 400, h = 280;
+                const scene = new THREE.Scene();
+                const cam = new THREE.PerspectiveCamera(45, w/h, 0.1, 100);
+                cam.position.set(0, 0.5, 4);
+                const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                renderer.setSize(w, h); renderer.setPixelRatio(1); el.appendChild(renderer.domElement);
+
+                const label = document.createElement('div');
+                label.textContent = 'HITBOX'; label.style.cssText = 'color:#00ffa0;font-size:22px;font-family:monospace;background:rgba(0,255,160,0.05);padding:6px 16px;border-radius:4px;border:1px solid rgba(0,255,160,0.2)';
+                const css = new CSS2DObject(label);
+                css.position.set(0, 0, 0); scene.add(css);
+
+                const box = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.7, 0.3), new THREE.MeshBasicMaterial({ color: 0x00ffa0, wireframe: true, transparent: true, opacity: 0.15 }));
+                box.position.set(0, 0, 0); scene.add(box);
+
+                const ambient = new THREE.AmbientLight(0x1a6040); scene.add(ambient);
+                const dir = new THREE.DirectionalLight(0x66ddbb, 1); dir.position.set(2, 3, 4); scene.add(dir);
+
+                el.addEventListener('click', () => { box.material.opacity = box.material.opacity > 0.4 ? 0.15 : 0.9; });
+                function anim() { renderer.render(scene, cam); requestAnimationFrame(anim); }
+                anim();
+            }},
+
+            // 2. RAYCASTER
+            { num: '02', title: 'RAYCASTER', layman: 'Laser from camera through mouse. Hover spheres to highlight.', init: (el) => {
+                const w = el.clientWidth || 400, h = 280;
+                const scene = new THREE.Scene();
+                const cam = new THREE.PerspectiveCamera(45, w/h, 0.1, 100);
+                cam.position.set(0, 0, 6);
+                const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                renderer.setSize(w, h); renderer.setPixelRatio(1); el.appendChild(renderer.domElement);
+
+                const spheres = [];
+                for(let i=-2; i<=2; i+=1) {
+                    const s = new THREE.Mesh(new THREE.SphereGeometry(0.4, 16, 16), new THREE.MeshStandardMaterial({ color: 0x1af0b8 }));
+                    s.position.set(i*1.2, 0, 0); scene.add(s); spheres.push(s);
+                }
+                const ambient = new THREE.AmbientLight(0x1a6040); scene.add(ambient);
+                const dir = new THREE.DirectionalLight(0x66ddbb, 1); dir.position.set(2, 4, 3); scene.add(dir);
+
+                const raycaster = new THREE.Raycaster();
+                const pointer = new THREE.Vector2();
+
+                el.addEventListener('pointermove', (e) => {
+                    const r = el.getBoundingClientRect();
+                    pointer.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+                    pointer.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+                    raycaster.setFromCamera(pointer, cam);
+                    spheres.forEach(s => s.material.color.setHex(0x1af0b8));
+                    const hits = raycaster.intersectObjects(spheres);
+                    if (hits.length) hits[0].object.material.color.setHex(0xff4433);
+                });
+
+                function anim() { renderer.render(scene, cam); requestAnimationFrame(anim); }
+                anim();
+            }},
+
+            // 3. LERP
+            { num: '03', title: 'LERP', layman: 'Smooth slide from A to B with cubic ease. Click to play.', init: (el) => {
+                const w = el.clientWidth || 400, h = 280;
+                const scene = new THREE.Scene();
+                const cam = new THREE.PerspectiveCamera(45, w/h, 0.1, 100);
+                cam.position.set(0, 1, 5);
+                const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                renderer.setSize(w, h); renderer.setPixelRatio(1); el.appendChild(renderer.domElement);
+
+                const a = new THREE.Mesh(new THREE.SphereGeometry(0.3, 16), new THREE.MeshStandardMaterial({ color: 0x1af0b8 }));
+                a.position.set(-2, 0, 0); scene.add(a);
+                const b = new THREE.Mesh(new THREE.SphereGeometry(0.3, 16), new THREE.MeshStandardMaterial({ color: 0xff4433 }));
+                b.position.set(2, 0, 0); scene.add(b);
+                const ball = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16), new THREE.MeshStandardMaterial({ color: 0x00ffa0, emissive: 0x00ffa0, emissiveIntensity: 0.3 }));
+                ball.position.set(-2, 0, 0); scene.add(ball);
+                const ambient = new THREE.AmbientLight(0x1a6040); scene.add(ambient);
+                const dir = new THREE.DirectionalLight(0x66ddbb, 1); dir.position.set(2, 4, 3); scene.add(dir);
+
+                let lerping = false, lerpT = 0;
+                el.addEventListener('click', () => { if(!lerping){lerping=true;lerpT=0;} });
+                function anim() {
+                    if (lerping) {
+                        lerpT += 0.02;
+                        if (lerpT >= 1) { lerpT = 1; lerping = false; }
+                        const ease = 1 - Math.pow(1 - lerpT, 3);
+                        ball.position.lerpVectors(a.position, b.position, ease);
+                    } else { ball.position.copy(a.position); }
+                    renderer.render(scene, cam);
+                    requestAnimationFrame(anim);
+                }
+                anim();
+            }},
+
+            // 4. SPRITE
+            { num: '04', title: 'SPRITE', layman: 'Flat image always faces camera. Auto-orbiting view.', init: (el) => {
+                const w = el.clientWidth || 400, h = 280;
+                const scene = new THREE.Scene();
+                const cam = new THREE.PerspectiveCamera(45, w/h, 0.1, 100);
+                cam.position.set(2, 1, 4);
+                const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                renderer.setSize(w, h); renderer.setPixelRatio(1); el.appendChild(renderer.domElement);
+
+                const canvas = document.createElement('canvas'); canvas.width=128; canvas.height=128;
+                const ctx = canvas.getContext('2d');
+                const grad = ctx.createRadialGradient(64,64,0,64,64,64);
+                grad.addColorStop(0,'rgba(0,255,160,1)'); grad.addColorStop(0.3,'rgba(0,255,160,0.6)'); grad.addColorStop(1,'rgba(0,0,0,0)');
+                ctx.fillStyle = grad; ctx.fillRect(0,0,128,128);
+                ctx.fillStyle = '#fff'; ctx.font='bold 20px monospace'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('SPRITE',64,64);
+                const tex = new THREE.CanvasTexture(canvas);
+                const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true }));
+                sprite.scale.set(1.4, 1.4, 1); scene.add(sprite);
+
+                const ambient = new THREE.AmbientLight(0x1a6040); scene.add(ambient);
+                let angle = 0;
+                function anim() {
+                    angle += 0.01;
+                    cam.position.x = 3 * Math.sin(angle);
+                    cam.position.z = 3 * Math.cos(angle);
+                    cam.lookAt(0, 0, 0);
+                    renderer.render(scene, cam);
+                    requestAnimationFrame(anim);
+                }
+                anim();
+            }},
+
+            // 5. ADDITIVE BLENDING
+            { num: '05', title: 'ADDITIVE BLENDING', layman: 'Two glowing orbs overlap — center gets brighter.', init: (el) => {
+                const w = el.clientWidth || 400, h = 280;
+                const scene = new THREE.Scene();
+                const cam = new THREE.PerspectiveCamera(45, w/h, 0.1, 100);
+                cam.position.set(0, 0, 4);
+                const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                renderer.setSize(w, h); renderer.setPixelRatio(1); el.appendChild(renderer.domElement);
+
+                function makeGlow(color) {
+                    const c = document.createElement('canvas'); c.width=64; c.height=64;
+                    const cx = c.getContext('2d');
+                    const g = cx.createRadialGradient(32,32,0,32,32,32);
+                    g.addColorStop(0,color); g.addColorStop(0.4,color.replace('1)','0.4)')); g.addColorStop(1,'rgba(0,0,0,0)');
+                    cx.fillStyle=g; cx.fillRect(0,0,64,64);
+                    return new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), blending: THREE.AdditiveBlending, transparent: true, depthWrite: false });
+                }
+                const s1 = new THREE.Sprite(makeGlow('rgba(0,255,160,1)')); s1.scale.set(2,2,1); s1.position.set(-0.7,0,0); scene.add(s1);
+                const s2 = new THREE.Sprite(makeGlow('rgba(0,229,255,1)')); s2.scale.set(2,2,1); s2.position.set(0.7,0,0); scene.add(s2);
+
+                function anim() {
+                    const t = Date.now() * 0.001;
+                    s1.position.x = -0.7 + Math.sin(t*0.6)*0.3;
+                    s2.position.x = 0.7 - Math.sin(t*0.6+0.5)*0.3;
+                    renderer.render(scene, cam);
+                    requestAnimationFrame(anim);
+                }
+                anim();
+            }},
+
+            // 6. GHOST
+            { num: '06', title: 'GHOST', layman: 'Invisible 3D mesh behind visuals. Click to toggle ghost view.', init: (el) => {
+                const w = el.clientWidth || 400, h = 280;
+                const scene = new THREE.Scene();
+                const cam = new THREE.PerspectiveCamera(45, w/h, 0.1, 100);
+                cam.position.set(0, 0.5, 4);
+                const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                renderer.setSize(w, h); renderer.setPixelRatio(1); el.appendChild(renderer.domElement);
+
+                const labelDiv = document.createElement('div');
+                labelDiv.textContent = '👻 GHOST'; labelDiv.style.cssText = 'color:#00ffa0;font-size:18px;font-family:monospace;background:rgba(0,255,160,0.05);padding:4px 12px;border-radius:4px;';
+                const css = new CSS2DObject(labelDiv); css.position.set(0,0.3,0); scene.add(css);
+
+                const ghost = new THREE.Mesh(new THREE.BoxGeometry(2,0.6,0.3), new THREE.MeshBasicMaterial({ color: 0x00ffa0, wireframe: true, transparent: true, opacity: 0 }));
+                ghost.position.set(0,0,0); scene.add(ghost);
+
+                const ambient = new THREE.AmbientLight(0x1a6040); scene.add(ambient);
+                let visible = false;
+                el.addEventListener('click', () => { visible = !visible; ghost.material.opacity = visible ? 0.8 : 0; });
+                function anim() { renderer.render(scene, cam); requestAnimationFrame(anim); }
+                anim();
+            }},
+
+            // 7. DRAG vs CLICK
+            { num: '07', title: 'DRAG vs CLICK', layman: 'Drag moves the cube. Click counts. Try both.', init: (el) => {
+                const w = el.clientWidth || 400, h = 280;
+                const scene = new THREE.Scene();
+                const cam = new THREE.PerspectiveCamera(45, w/h, 0.1, 100);
+                cam.position.set(0, 0.5, 5);
+                const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                renderer.setSize(w, h); renderer.setPixelRatio(1); el.appendChild(renderer.domElement);
+
+                const cube = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.8), new THREE.MeshStandardMaterial({ color: 0x1af0b8, emissive: 0x1af0b8, emissiveIntensity: 0.1 }));
+                cube.position.set(0, 0, 0); scene.add(cube);
+                const ambient = new THREE.AmbientLight(0x1a6040); scene.add(ambient);
+                const dir = new THREE.DirectionalLight(0x66ddbb, 1); dir.position.set(2, 4, 3); scene.add(dir);
+
+                const labelDiv = document.createElement('div');
+                labelDiv.textContent = 'clicks: 0 | drags: 0'; labelDiv.style.cssText = 'color:#a0d4c0;font-size:14px;font-family:monospace;';
+                const css = new CSS2DObject(labelDiv); css.position.set(0, -1.2, 0); scene.add(css);
+
+                let clicks = 0, drags = 0, downPos = null;
+                const drag = new DragControls([cube], cam, renderer.domElement);
+                drag.addEventListener('dragstart', () => { downPos = { x: cube.position.x, y: cube.position.y, z: cube.position.z }; });
+                drag.addEventListener('dragend', () => { drags++; labelDiv.textContent = `clicks: ${clicks} | drags: ${drags}`; });
+                renderer.domElement.addEventListener('click', (e) => {
+                    if (downPos) {
+                        const dx = cube.position.x - downPos.x;
+                        const dy = cube.position.y - downPos.y;
+                        if (dx*dx+dy*dy > 0.01) { downPos = null; return; }
+                    }
+                    clicks++; labelDiv.textContent = `clicks: ${clicks} | drags: ${drags}`;
+                    cube.material.color.setHex(Math.random()*0xffffff);
+                });
+                function anim() { renderer.render(scene, cam); requestAnimationFrame(anim); }
+                anim();
+            }},
+
+            // 8. FOLLOWER
+            { num: '08', title: 'FOLLOWER', layman: 'Drag any sphere — the whole chain moves together.', init: (el) => {
+                const w = el.clientWidth || 400, h = 280;
+                const scene = new THREE.Scene();
+                const cam = new THREE.PerspectiveCamera(45, w/h, 0.1, 100);
+                cam.position.set(0, 1, 5);
+                const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                renderer.setSize(w, h); renderer.setPixelRatio(1); el.appendChild(renderer.domElement);
+
+                const leader = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16), new THREE.MeshStandardMaterial({ color: 0x00ffa0, emissive: 0x00ffa0, emissiveIntensity: 0.3 }));
+                leader.position.set(0, 0, 0); scene.add(leader);
+                const allSpheres = [leader];
+                for(let i=0; i<4; i++) {
+                    const f = new THREE.Mesh(new THREE.SphereGeometry(0.25, 12), new THREE.MeshStandardMaterial({ color: 0x1af0b8 }));
+                    f.position.set(-1.2-i*0.8, 0, 0); scene.add(f); allSpheres.push(f);
+                }
+                const ambient = new THREE.AmbientLight(0x1a6040); scene.add(ambient);
+                const dir = new THREE.DirectionalLight(0x66ddbb, 1); dir.position.set(2, 4, 3); scene.add(dir);
+
+                let savedPositions = null;
+                const drag = new DragControls(allSpheres, cam, renderer.domElement);
+                drag.addEventListener('dragstart', (e) => {
+                    savedPositions = allSpheres.map(s => s.position.clone());
+                });
+                drag.addEventListener('drag', (e) => {
+                    if (!savedPositions) return;
+                    const dragged = e.object;
+                    const delta = dragged.position.clone().sub(savedPositions[allSpheres.indexOf(dragged)]);
+                    allSpheres.forEach((s, i) => {
+                        if (s !== dragged) {
+                            s.position.copy(savedPositions[i]).add(delta);
+                        }
+                    });
+                });
+                drag.addEventListener('dragend', () => { savedPositions = null; });
+                function anim() { renderer.render(scene, cam); requestAnimationFrame(anim); }
+                anim();
+            }},
+
+            // 9. ISOLATION
+            { num: '09', title: 'ISOLATION MODE', layman: 'Click a sphere — others fade, camera zooms. Click BACK.', init: (el) => {
+                const w = el.clientWidth || 400, h = 280;
+                const scene = new THREE.Scene();
+                const cam = new THREE.PerspectiveCamera(45, w/h, 0.1, 100);
+                cam.position.set(0, 1, 6);
+                const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                renderer.setSize(w, h); renderer.setPixelRatio(1); el.appendChild(renderer.domElement);
+                const controls = new OrbitControls(cam, renderer.domElement);
+                controls.enableDamping = true;
+
+                const colors = [0xff4433, 0x1af0b8, 0x00ffa0, 0xffaa33, 0x66ddbb];
+                const spheres = [];
+                for(let i=-2; i<=2; i++) {
+                    const s = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16), new THREE.MeshStandardMaterial({ color: colors[i+2] }));
+                    s.position.set(i*1.5, 0, 0); scene.add(s); spheres.push(s);
+                }
+                const ambient = new THREE.AmbientLight(0x1a6040); scene.add(ambient);
+                const dir = new THREE.DirectionalLight(0x66ddbb, 1); dir.position.set(2, 4, 3); scene.add(dir);
+
+                const backBtn = document.createElement('div');
+                backBtn.textContent = '← BACK'; backBtn.style.cssText = 'display:none;position:absolute;top:8px;left:50%;transform:translateX(-50%);color:#00ffa0;font-size:16px;font-family:monospace;cursor:pointer;background:rgba(10,20,16,0.8);padding:4px 16px;border-radius:4px;border:1px solid rgba(0,255,160,0.3);z-index:10;';
+                el.style.position = 'relative'; el.appendChild(backBtn);
+
+                let isolated = null;
+                function isolate(target) {
+                    if (isolated) return;
+                    isolated = target;
+                    spheres.forEach(s => {
+                        if (s !== target) { s.material.transparent = true; s.material.opacity = 0.1; }
+                    });
+                    cam.position.set(target.position.x + 1.5, target.position.y + 0.5, target.position.z + 2);
+                    backBtn.style.display = 'block';
+                }
+                function restore() {
+                    spheres.forEach(s => { s.material.opacity = 1; s.material.transparent = false; });
+                    cam.position.set(0, 1, 6);
+                    isolated = null;
+                    backBtn.style.display = 'none';
+                }
+                renderer.domElement.addEventListener('click', (e) => {
+                    if (isolated) return;
+                    const r = el.getBoundingClientRect();
+                    const p = new THREE.Vector2(((e.clientX-r.left)/r.width)*2-1, -((e.clientY-r.top)/r.height)*2+1);
+                    const ray = new THREE.Raycaster(); ray.setFromCamera(p, cam);
+                    const hits = ray.intersectObjects(spheres);
+                    if (hits.length) isolate(hits[0].object);
+                });
+                backBtn.addEventListener('click', restore);
+
+                function anim() { controls.update(); renderer.render(scene, cam); requestAnimationFrame(anim); }
+                anim();
+            }},
+
+            // 10. Z-DEPTH PUSH
+            { num: '10', title: 'Z-DEPTH PUSH', layman: 'Type a letter. Matching items stay, others push back.', init: (el) => {
+                const w = el.clientWidth || 400, h = 280;
+                const scene = new THREE.Scene();
+                const cam = new THREE.PerspectiveCamera(45, w/h, 0.1, 100);
+                cam.position.set(0, 0.5, 6);
+                const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                renderer.setSize(w, h); renderer.setPixelRatio(1); el.appendChild(renderer.domElement);
+
+                const names = ['AI-3', 'FUCHE', 'KOKORO', 'JARVIS', 'QWEN', 'KITTEN', 'ALPINE', 'BANK', 'CREDIT', 'NEXT'];
+                const spheres = []; const labels = [];
+                names.forEach((name, i) => {
+                    const s = new THREE.Mesh(new THREE.SphereGeometry(0.4, 12), new THREE.MeshStandardMaterial({ color: 0x1af0b8 }));
+                    const angle = (i / names.length) * Math.PI * 2;
+                    const r = 2.5;
+                    s.position.set(Math.cos(angle)*r, 0, Math.sin(angle)*r);
+                    s.userData.origZ = s.position.z; s.userData.name = name;
+                    scene.add(s); spheres.push(s);
+
+                    const d = document.createElement('div');
+                    d.textContent = name; d.style.cssText = 'color:#a0d4c0;font-size:10px;font-family:monospace;';
+                    const css = new CSS2DObject(d); css.position.copy(s.position);
+                    scene.add(css); labels.push(css);
+                });
+                const ambient = new THREE.AmbientLight(0x1a6040); scene.add(ambient);
+                const dir = new THREE.DirectionalLight(0x66ddbb, 1); dir.position.set(2, 4, 3); scene.add(dir);
+
+                const input = document.createElement('input');
+                input.placeholder = 'type to search...';
+                input.style.cssText = 'position:absolute;top:8px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.5);color:#00ffa0;border:1px solid rgba(0,255,160,0.2);padding:4px 12px;border-radius:4px;font-family:monospace;font-size:12px;z-index:10;width:160px;outline:none;';
+                el.style.position = 'relative'; el.appendChild(input);
+
+                input.addEventListener('input', () => {
+                    const q = input.value.trim().toLowerCase();
+                    spheres.forEach((s, i) => {
+                        const match = !q || s.userData.name.toLowerCase().includes(q);
+                        s.position.z = match ? s.userData.origZ : s.userData.origZ + 5;
+                        s.material.opacity = match ? 1 : 0.05;
+                        s.material.transparent = !match;
+                        labels[i].position.z = s.position.z;
+                    });
+                });
+
+                function anim() { renderer.render(scene, cam); requestAnimationFrame(anim); }
+                anim();
+            }},
+        ];
+
+        demos.forEach((d) => {
+            const card = document.createElement('div');
+            card.className = 'demo-card';
+            card.innerHTML = `<div class="demo-header"><span class="demo-num">${d.num}</span><span class="demo-title">${d.title}</span></div><div class="demo-layman">${d.layman}</div>`;
+            document.getElementById('demos').appendChild(card);
+            const canvasSlot = document.createElement('div');
+            card.insertBefore(canvasSlot, card.lastElementChild);
+            d.init(canvasSlot);
+        });
+    </script>
+</body>
+</html>
