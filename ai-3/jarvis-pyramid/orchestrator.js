@@ -13,6 +13,7 @@ import { DragControls } from 'three/addons/controls/DragControls.js';
 let currentMode = 'category';
 let cls = [], dgs = [], lns = [], sns = [], webLines = [];
 let dragControls;
+let _idleTimer = null;
 
 function rebuildPyramid() {
     cls.forEach(o => { scene.remove(o); if (o.userData.label) { o.userData.label.element.style.display = ''; scene.remove(o.userData.label); } if (o.userData.halo) scene.remove(o.userData.halo); });
@@ -89,6 +90,19 @@ buildWebLines();
 wireInteraction(dgs, dragControls, cls);
 wireSearch(sns);
 wireDev();
+
+function startAutoRotate() { orbitControls.autoRotate = true; }
+function stopAutoRotate() { orbitControls.autoRotate = false; }
+function resetIdleTimer() {
+    stopAutoRotate();
+    if (_idleTimer) clearTimeout(_idleTimer);
+    _idleTimer = setTimeout(startAutoRotate, 5000);
+}
+orbitControls.autoRotate = true;
+orbitControls.autoRotateSpeed = 0.2;
+renderer.domElement.addEventListener('pointerdown', resetIdleTimer);
+renderer.domElement.addEventListener('wheel', resetIdleTimer);
+renderer.domElement.addEventListener('project-click', resetIdleTimer);
 
 renderer.domElement.addEventListener('project-click', (e) => {
     const obj = e.detail.obj;

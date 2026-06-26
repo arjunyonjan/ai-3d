@@ -112,6 +112,7 @@ function createFeature(feat, ghost, fx, fy, fz, cx, cy, cz) {
     featGhost.userData._followers = [
         pos => featLabel.position.set(pos.x, pos.y - 0.7, pos.z),
         pos => featureMesh.position.copy(pos),
+        pos => edgeLine.position.copy(pos),
         pos => { if (line) { line.geometry.dispose(); line.geometry = new THREE.BufferGeometry().setFromPoints([ghost.position, pos]); } },
     ];
     scene.add(featGhost);
