@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import { scene, CSS2DObject } from './core.js';
+import { scene, camera, CSS2DObject } from './core.js';
+import { measureLabelPixels, pixelsTo3D } from './labels.js';
 
 export function buildFeatures(folder, ghost, cx, cy, cz) {
     const features = folder.features || [];
@@ -92,15 +93,18 @@ function createFeature(feat, ghost, fx, fy, fz, cx, cy, cz) {
     featureMesh.userData.line = line;
 
     const featGhostMat = new THREE.MeshBasicMaterial({ color: 0x0a1410, transparent: true, opacity: 0, depthWrite: false, depthTest: false });
+    const dist = camera.position.distanceTo(new THREE.Vector3(fx, fy, fz));
+    const { w: featW, h: featH } = measureLabelPixels(`<span class="feat-icon">${icon}</span> ${feat.text}`, '');
+    const { w: featGhostW, h: featGhostH } = pixelsTo3D(featW, featH, dist, camera);
     const featGhost = new THREE.Mesh(
-        new THREE.BoxGeometry(2.5, 1.5, 0.3),
+        new THREE.BoxGeometry(featGhostW, featGhostH, 0.3),
         featGhostMat
     );
     featGhost.position.set(fx, fy, fz);
     if (!window.__featureGhostMats) window.__featureGhostMats = [];
     window.__featureGhostMats.push(featGhostMat);
 
-    const edgeGeo = new THREE.EdgesGeometry(new THREE.BoxGeometry(2.5, 1.5, 0.3));
+    const edgeGeo = new THREE.EdgesGeometry(new THREE.BoxGeometry(featGhostW, featGhostH, 0.3));
     const edgeMat = new THREE.LineBasicMaterial({ color: 0x00ffa0, transparent: true, opacity: 0, depthWrite: false });
     const edgeLine = new THREE.Line(edgeGeo, edgeMat);
     edgeLine.position.copy(featGhost.position);
