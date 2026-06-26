@@ -33,7 +33,7 @@ function buildPyramid(pyramidData) {
 
         const { w: labelW, h: labelH } = measureLabelPixels(labelDiv.innerHTML, recentClass);
         const dist = camera.position.distanceTo(new THREE.Vector3(cx, cy, cz));
-        const { w: ghostW, h: ghostH } = pixelsTo3D(labelW, labelH, dist, camera);
+        const { w: ghostW, h: ghostH } = pixelsTo3D(labelW + 20, labelH + 20, dist, camera);
 
         const ghostMat = new THREE.MeshBasicMaterial({ color: 0x0a1410, transparent: true, opacity: 0, depthWrite: false, depthTest: false });
         if (!window.__coreGhostMats) window.__coreGhostMats = [];

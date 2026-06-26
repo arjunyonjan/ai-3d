@@ -95,7 +95,7 @@ function createFeature(feat, ghost, fx, fy, fz, cx, cy, cz) {
     const featGhostMat = new THREE.MeshBasicMaterial({ color: 0x0a1410, transparent: true, opacity: 0, depthWrite: false, depthTest: false });
     const dist = camera.position.distanceTo(new THREE.Vector3(fx, fy, fz));
     const { w: featW, h: featH } = measureLabelPixels(`<span class="feat-icon">${icon}</span> ${feat.text}`, '');
-    const { w: featGhostW, h: featGhostH } = pixelsTo3D(featW, featH, dist, camera);
+    const { w: featGhostW, h: featGhostH } = pixelsTo3D(featW + 16, featH + 16, dist, camera);
     const featGhost = new THREE.Mesh(
         new THREE.BoxGeometry(featGhostW, featGhostH, 0.3),
         featGhostMat

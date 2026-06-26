@@ -12,6 +12,8 @@ const _targetTo = new THREE.Vector3();
 let _camAnimating = false;
 let _camAnimStart = 0;
 const CAM_ANIM_DURATION = 1.0;
+let _exitHalos = [];
+let _exitOpacity = 0.8;
 
 export function isAnimating() { return _camAnimating; }
 
@@ -22,9 +24,15 @@ export function tickCameraAnimation() {
     const ease = 1 - Math.pow(1 - p, 3);
     camera.position.lerpVectors(_camFrom, _camTo, ease);
     orbitControls.target.lerpVectors(_targetFrom, _targetTo, ease);
+    if (_exitHalos.length > 0) {
+        const fade = ease < 0.5 ? 0 : (ease - 0.5) * 2;
+        _exitHalos.forEach(h => h.material.opacity = fade * _exitOpacity);
+    }
     if (p >= 1) {
         _camAnimating = false;
         orbitControls.enabled = true;
+        _exitHalos.forEach(h => { if (h.visible) h.material.opacity = _exitOpacity; });
+        _exitHalos = [];
         return false;
     }
     return true;
@@ -62,10 +70,17 @@ export function enterIsolation(obj, cls, webLines) {
 export function exitIsolation(webLines) {
     if (!isolationMode) return;
     isolationMode = false;
+    _exitHalos = [];
     hiddenStates.forEach((state, obj) => {
         obj.visible = state;
         if (obj.userData.label) { obj.userData.label.visible = state; obj.userData.label.element.style.display = state ? '' : 'none'; }
-        if (obj.userData.halo) obj.userData.halo.visible = state;
+        if (obj.userData.halo) {
+            obj.userData.halo.visible = state;
+            if (state) {
+                obj.userData.halo.material.opacity = 0;
+                _exitHalos.push(obj.userData.halo);
+            }
+        }
     });
     hiddenStates.clear();
     webLines.forEach(l => l.visible = true);
