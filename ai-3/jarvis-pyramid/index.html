@@ -9,7 +9,7 @@
         body { margin: 0; overflow: hidden; background: #0a0e17; font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace; }
         #search-wrapper {
             position: absolute; top: 85px; left: 50%; transform: translateX(-50%);
-            z-index: 20; display: flex; justify-content: center;
+            z-index: 20; display: flex; justify-content: center; gap: 8px;
         }
         #search-input {
             background: rgba(10, 18, 30, 0.7); backdrop-filter: blur(16px);
@@ -25,6 +25,135 @@
             box-shadow: 0 0 30px rgba(0, 229, 255, 0.05), inset 0 0 20px rgba(0, 229, 255, 0.02);
         }
         #search-input::placeholder { color: rgba(160, 196, 212, 0.3); }
+        #stt-btn {
+            background: rgba(10, 18, 30, 0.7); backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 229, 255, 0.15); border-radius: 8px;
+            width: 42px; height: 42px; cursor: pointer; font-size: 1rem;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.3s ease; color: rgba(160, 196, 212, 0.5);
+            flex-shrink: 0;
+        }
+        #stt-btn:hover { border-color: rgba(0, 229, 255, 0.4); color: #a0c4d4; }
+        #stt-btn.listening {
+            color: #ff0044; border-color: #ff0044;
+            box-shadow: 0 0 20px rgba(255, 0, 68, 0.3);
+            animation: stt-pulse 1s ease-in-out infinite;
+        }
+        .voice-level {
+            display: none; gap: 2px; align-items: center;
+            height: 20px; margin-top: auto; margin-bottom: auto;
+        }
+        .voice-level.active { display: flex; }
+        .voice-bar {
+            width: 2px; height: 100%; border-radius: 1px;
+            background: #00ffa0;
+            box-shadow: 0 0 6px #00ffa0, 0 0 12px rgba(0, 255, 160, 0.3);
+            transform-origin: bottom;
+            transition: transform 0.06s ease;
+        }
+        .voice-bar:nth-child(1) { --vb-m: 0.6; }
+        .voice-bar:nth-child(2) { --vb-m: 1.0; }
+        .voice-bar:nth-child(3) { --vb-m: 1.0; }
+        .voice-bar:nth-child(4) { --vb-m: 0.6; }
+        @keyframes stt-pulse {
+            0%, 100% { box-shadow: 0 0 15px rgba(255, 0, 68, 0.2); }
+            50% { box-shadow: 0 0 30px rgba(255, 0, 68, 0.5); }
+        }
+        /* STT Button — SVG mic */
+        #stt-btn svg {
+            width: 18px; height: 18px;
+            fill: currentColor;
+            transition: 0.3s ease;
+        }
+        /* STT Hologram — ChatGPT-style orbiting dots */
+        #stt-hologram {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 10; pointer-events: none;
+            display: none; width: 0; height: 0;
+        }
+        #stt-hologram.active { display: block; }
+        .stt-ring {
+            position: absolute; border-radius: 50%;
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            top: 50%; left: 50%;
+            animation: ring-expand 2.5s ease-out infinite;
+            width: 0; height: 0;
+        }
+        .stt-ring:nth-child(1) { animation-delay: 0s; }
+        .stt-ring:nth-child(2) { animation-delay: 0.8s; }
+        .stt-ring:nth-child(3) { animation-delay: 1.6s; }
+        @keyframes ring-expand {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0.5; }
+            100% { transform: translate(-50%, -50%) scale(10); opacity: 0; }
+        }
+        .stt-orbit {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px; height: 80px;
+        }
+        .stt-orbit-dot {
+            position: absolute; top: 50%; left: 50%;
+            width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px;
+            border-radius: 50%;
+            animation: dot-orbit 2s linear infinite;
+            box-shadow: 0 0 14px var(--oc), 0 0 28px var(--oc);
+        }
+        .stt-orbit-dot:nth-child(1) { --oc: #00e5ff; animation-delay: 0s; }
+        .stt-orbit-dot:nth-child(2) { --oc: #00ffa0; animation-delay: 0.5s; }
+        .stt-orbit-dot:nth-child(3) { --oc: #ffaa33; animation-delay: 1.0s; }
+        .stt-orbit-dot:nth-child(4) { --oc: #ff66aa; animation-delay: 1.5s; }
+        @keyframes dot-orbit {
+            0%   { transform: rotate(0deg)   translateY(-40px); opacity: 0.3; }
+            25%  { transform: rotate(90deg)  translateY(-40px); opacity: 1; }
+            50%  { transform: rotate(180deg) translateY(-40px); opacity: 0.3; }
+            75%  { transform: rotate(270deg) translateY(-40px); opacity: 1; }
+            100% { transform: rotate(360deg) translateY(-40px); opacity: 0.3; }
+        }
+        .stt-waveform {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex; gap: 3px; align-items: center;
+            height: 30px;
+        }
+        .stt-wave-bar {
+            width: 3px; height: 100%; border-radius: 2px;
+            background: rgba(0, 229, 255, 0.6);
+            box-shadow: 0 0 6px rgba(0, 229, 255, 0.3);
+            transform-origin: bottom;
+            transition: transform 0.05s ease;
+        }
+        .stt-wave-bar:nth-child(1) { --bar-mult: 0.5; }
+        .stt-wave-bar:nth-child(2) { --bar-mult: 0.8; }
+        .stt-wave-bar:nth-child(3) { --bar-mult: 1.0; }
+        .stt-wave-bar:nth-child(4) { --bar-mult: 0.8; }
+        .stt-wave-bar:nth-child(5) { --bar-mult: 0.5; }
+        .stt-label {
+            position: absolute; left: 50%; bottom: -50px; transform: translateX(-50%);
+            color: rgba(0, 229, 255, 0.5); font-size: 0.5rem;
+            letter-spacing: 3px; text-transform: uppercase;
+            white-space: nowrap;
+            animation: label-fade 1.8s ease-in-out infinite;
+        }
+        @keyframes label-fade {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.8; }
+        }
+        /* STT Speech Preview */
+        #stt-preview {
+            position: fixed; top: 130px; left: 50%; transform: translateX(-50%);
+            z-index: 15; pointer-events: none;
+            background: rgba(10, 18, 30, 0.75); backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 229, 255, 0.12);
+            border-radius: 6px; padding: 5px 14px;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.6rem;
+            color: rgba(0, 229, 255, 0.7); letter-spacing: 0.5px;
+            white-space: nowrap; max-width: 320px; overflow: hidden; text-overflow: ellipsis;
+            opacity: 0; transform: translateX(-50%) translateY(-4px);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+        #stt-preview.active {
+            opacity: 1; transform: translateX(-50%) translateY(0);
+        }
         .folder-label, .folder-label * { pointer-events: none !important; }
         .feature-label, .feature-label * { pointer-events: none !important; }
         .folder-label {
@@ -79,6 +208,22 @@
         #legend .g { background: #00e5ff; box-shadow: 0 0 20px #00e5ff33; }
         #legend .r { background: #ff0022; box-shadow: 0 0 20px #ff002233; }
 
+        #tech-filter {
+            position: absolute; top: 140px; left: 50%; transform: translateX(-50%);
+            z-index: 22; display: flex; gap: 4px; flex-wrap: wrap; justify-content: center;
+            max-width: 600px;
+        }
+        .tf-btn {
+            padding: 3px 10px; font-size: 0.5rem; letter-spacing: 1px;
+            color: rgba(160, 196, 212, 0.35); cursor: pointer; border-radius: 3px;
+            transition: 0.2s; font-family: 'JetBrains Mono', monospace; text-transform: uppercase;
+            border: 1px solid rgba(0, 229, 255, 0.06);
+            background: rgba(10, 18, 30, 0.4);
+        }
+        .tf-btn:hover { color: rgba(160, 196, 212, 0.7); border-color: rgba(0, 229, 255, 0.15); }
+        .tf-btn.active { color: #00e5ff; border-color: rgba(0, 229, 255, 0.3); background: rgba(0, 229, 255, 0.06); }
+        .tf-btn .tf-dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+
         #view-toggle {
             position: absolute; top: 50px; left: 50%; transform: translateX(-50%);
             z-index: 25; display: flex; gap: 2px;
@@ -121,6 +266,173 @@
         #dev-panel input[type="checkbox"] { accent-color: #00ffa0; }
         #dev-panel .dev-title { color: rgba(0,255,160,0.5); font-size: 0.5rem; letter-spacing: 2px; margin-bottom: 6px; text-transform: uppercase; }
         #dev-fps-display { position: fixed; top: 16px; right: 16px; z-index: 100; color: rgba(0,255,160,0.4); font-family: monospace; font-size: 0.55rem; display: none; }
+        .hide-3d canvas,
+        .hide-3d .label-renderer { display: none !important; }
+
+        /* Detail Panel */
+        #detail-panel {
+            position: fixed; top: 0; right: -420px; width: 380px; height: 100vh;
+            z-index: 50; background: rgba(10, 18, 30, 0.92);
+            backdrop-filter: blur(20px); border-left: 1px solid rgba(0, 229, 255, 0.1);
+            padding: 24px; box-sizing: border-box;
+            transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+            overflow-y: auto;
+        }
+        #detail-panel.open { right: 0; }
+        #detail-panel::-webkit-scrollbar { width: 3px; }
+        #detail-panel::-webkit-scrollbar-track { background: transparent; }
+        #detail-panel::-webkit-scrollbar-thumb { background: rgba(0, 229, 255, 0.2); border-radius: 2px; }
+        .dp-close {
+            position: absolute; top: 16px; right: 20px;
+            color: rgba(160, 196, 212, 0.4); cursor: pointer; font-size: 1.2rem;
+            transition: 0.2s; border: none; background: none;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .dp-close:hover { color: #00e5ff; }
+        .dp-title { font-size: 0.85rem; color: #00e5ff; letter-spacing: 2px; margin-bottom: 4px; font-weight: 500; }
+        .dp-subtitle { font-size: 0.6rem; color: rgba(160, 196, 212, 0.4); letter-spacing: 1px; margin-bottom: 20px; }
+        .dp-section { margin-bottom: 16px; }
+        .dp-label { font-size: 0.5rem; color: rgba(160, 196, 212, 0.3); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 4px; }
+        .dp-value { font-size: 0.7rem; color: #a0c4d4; letter-spacing: 0.5px; }
+        .dp-tech { display: inline-flex; align-items: center; gap: 6px; }
+        .dp-tech-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .dp-status { display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; border-radius: 3px; font-size: 0.6rem; letter-spacing: 1px; }
+        .dp-status.success { color: #00e5ff; background: rgba(0, 229, 255, 0.08); border: 1px solid rgba(0, 229, 255, 0.15); }
+        .dp-status.fail { color: #ff0022; background: rgba(255, 0, 34, 0.08); border: 1px solid rgba(255, 0, 34, 0.15); }
+        .dp-features { list-style: none; padding: 0; margin: 0; }
+        .dp-features li {
+            padding: 6px 8px; margin-bottom: 4px; border-radius: 3px;
+            font-size: 0.6rem; letter-spacing: 0.3px;
+            border-left: 2px solid rgba(160, 196, 212, 0.15);
+        }
+        .dp-features li.success { border-left-color: #00e5ff; color: #a0d4e0; background: rgba(0, 229, 255, 0.03); }
+        .dp-features li.fail { border-left-color: #ff0022; color: #ff8899; background: rgba(255, 0, 34, 0.03); }
+        .dp-features .fi { margin-right: 4px; }
+        .dp-row { display: flex; gap: 24px; }
+        .dp-row .dp-section { flex: 1; }
+
+        /* Vox Orby — Heavenly circular ring animation */
+        #speaking-indicator {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 10; pointer-events: none;
+            display: none; width: 0; height: 0;
+        }
+        #speaking-indicator.active { display: block; }
+
+        .sp-glow {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px; height: 200px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(0,229,255,0.06) 0%, rgba(120,80,255,0.03) 40%, transparent 70%);
+            filter: blur(20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .sp-ring-container {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .sp-ring {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 1px solid transparent;
+        }
+
+        .sp-ring-outer {
+            width: 180px; height: 180px;
+            border-color: rgba(120, 80, 255, 0.2);
+            box-shadow: 0 0 30px rgba(120, 80, 255, 0.05), inset 0 0 30px rgba(120, 80, 255, 0.02);
+            animation: sp-rotate-cw 8s linear infinite;
+        }
+        .sp-ring-mid {
+            width: 120px; height: 120px;
+            border-color: rgba(0, 229, 255, 0.2);
+            box-shadow: 0 0 25px rgba(0, 229, 255, 0.05), inset 0 0 25px rgba(0, 229, 255, 0.02);
+            animation: sp-rotate-ccw 5s linear infinite;
+        }
+        .sp-ring-inner {
+            width: 70px; height: 70px;
+            border-color: rgba(0, 255, 160, 0.15);
+            box-shadow: 0 0 20px rgba(0, 255, 160, 0.03);
+            animation: sp-rotate-cw 3s linear infinite;
+        }
+
+        .sp-dot {
+            position: absolute;
+            border-radius: 50%;
+            transition: opacity 0.08s ease, box-shadow 0.08s ease;
+        }
+        .sp-dot-outer {
+            width: 5px; height: 5px;
+            background: #9060ff;
+            box-shadow: 0 0 10px #9060ff, 0 0 20px rgba(144, 96, 255, 0.3);
+        }
+        .sp-dot-mid {
+            width: 4px; height: 4px;
+            background: #00e5ff;
+            box-shadow: 0 0 8px #00e5ff, 0 0 16px rgba(0, 229, 255, 0.3);
+        }
+        .sp-dot-inner {
+            width: 3px; height: 3px;
+            background: #00ffa0;
+            box-shadow: 0 0 6px #00ffa0, 0 0 12px rgba(0, 255, 160, 0.3);
+        }
+
+        /* Dots positioned via CSS rotation on ring */
+        .sp-ring-outer .sp-dot { top: -2.5px; left: 50%; margin-left: -2.5px; }
+        .sp-ring-mid .sp-dot { top: -2px; left: 50%; margin-left: -2px; }
+        .sp-ring-inner .sp-dot { top: -1.5px; left: 50%; margin-left: -1.5px; }
+
+        /* Orbiting dot animations (each at different start angle via nth-child) */
+        .sp-ring-outer .sp-dot:nth-child(1) { transform: rotate(0deg) translateY(-90px); }
+        .sp-ring-outer .sp-dot:nth-child(2) { transform: rotate(90deg) translateY(-90px); }
+        .sp-ring-outer .sp-dot:nth-child(3) { transform: rotate(180deg) translateY(-90px); }
+        .sp-ring-outer .sp-dot:nth-child(4) { transform: rotate(270deg) translateY(-90px); }
+
+        .sp-ring-mid .sp-dot:nth-child(1) { transform: rotate(0deg) translateY(-60px); }
+        .sp-ring-mid .sp-dot:nth-child(2) { transform: rotate(60deg) translateY(-60px); }
+        .sp-ring-mid .sp-dot:nth-child(3) { transform: rotate(120deg) translateY(-60px); }
+        .sp-ring-mid .sp-dot:nth-child(4) { transform: rotate(180deg) translateY(-60px); }
+        .sp-ring-mid .sp-dot:nth-child(5) { transform: rotate(240deg) translateY(-60px); }
+        .sp-ring-mid .sp-dot:nth-child(6) { transform: rotate(300deg) translateY(-60px); }
+
+        .sp-ring-inner .sp-dot:nth-child(1) { transform: rotate(0deg) translateY(-35px); }
+        .sp-ring-inner .sp-dot:nth-child(2) { transform: rotate(120deg) translateY(-35px); }
+        .sp-ring-inner .sp-dot:nth-child(3) { transform: rotate(240deg) translateY(-35px); }
+
+        @keyframes sp-rotate-cw {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        @keyframes sp-rotate-ccw {
+            from { transform: translate(-50%, -50%) rotate(360deg); }
+            to { transform: translate(-50%, -50%) rotate(0deg); }
+        }
+
+        /* Central orb — pulses with voice level */
+        .sp-orb {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px; height: 20px; border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #00ffa0, #00e5ff 40%, #6060ff 100%);
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.4), 0 0 60px rgba(0, 229, 255, 0.15);
+            transition: width 0.08s ease, height 0.08s ease, box-shadow 0.08s ease;
+        }
+
+        .sp-label {
+            position: absolute; left: 50%; bottom: -55px; transform: translateX(-50%);
+            color: rgba(0, 229, 255, 0.35); font-size: 0.5rem;
+            letter-spacing: 4px; text-transform: uppercase;
+            white-space: nowrap;
+            animation: sp-fade 2s ease-in-out infinite;
+        }
+        @keyframes sp-fade {
+            0%, 100% { opacity: 0.15; }
+            50% { opacity: 0.6; }
+        }
     </style>
 </head>
 <body>
@@ -130,25 +442,105 @@
         <span class="vt-btn active" data-mode="category">CATEGORY</span>
         <span class="vt-btn" data-mode="alpha">A–Z</span>
     </div>
-    <div id="search-wrapper"><input type="text" id="search-input" placeholder="SEARCH MEMORY MAP..." /></div>
+    <div id="search-wrapper"><input type="text" id="search-input" placeholder="SEARCH MEMORY MAP..." /><button id="stt-btn"><svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1H3v1a9 9 0 0 0 8 8.94V21h-3v2h8v-2h-3v-1.06A9 9 0 0 0 21 11v-1z"/></svg></button><div class="voice-level" id="voice-level"><div class="voice-bar"></div><div class="voice-bar"></div><div class="voice-bar"></div><div class="voice-bar"></div></div></div>
+    <div id="stt-hologram">
+        <div class="stt-ring"></div>
+        <div class="stt-ring"></div>
+        <div class="stt-ring"></div>
+        <div class="stt-orbit">
+            <span class="stt-orbit-dot"></span>
+            <span class="stt-orbit-dot"></span>
+            <span class="stt-orbit-dot"></span>
+            <span class="stt-orbit-dot"></span>
+        </div>
+        <div class="stt-waveform">
+            <div class="stt-wave-bar"></div>
+            <div class="stt-wave-bar"></div>
+            <div class="stt-wave-bar"></div>
+            <div class="stt-wave-bar"></div>
+            <div class="stt-wave-bar"></div>
+        </div>
+        <div class="stt-label">LISTENING</div>
+    </div>
+    <div id="stt-preview"></div>
+    <div id="speaking-indicator">
+        <div class="sp-glow"></div>
+        <div class="sp-ring-container">
+            <div class="sp-ring sp-ring-outer">
+                <span class="sp-dot sp-dot-outer"></span>
+                <span class="sp-dot sp-dot-outer"></span>
+                <span class="sp-dot sp-dot-outer"></span>
+                <span class="sp-dot sp-dot-outer"></span>
+            </div>
+            <div class="sp-ring sp-ring-mid">
+                <span class="sp-dot sp-dot-mid"></span>
+                <span class="sp-dot sp-dot-mid"></span>
+                <span class="sp-dot sp-dot-mid"></span>
+                <span class="sp-dot sp-dot-mid"></span>
+                <span class="sp-dot sp-dot-mid"></span>
+                <span class="sp-dot sp-dot-mid"></span>
+            </div>
+            <div class="sp-ring sp-ring-inner">
+                <span class="sp-dot sp-dot-inner"></span>
+                <span class="sp-dot sp-dot-inner"></span>
+                <span class="sp-dot sp-dot-inner"></span>
+            </div>
+        </div>
+        <div class="sp-orb"></div>
+        <div class="sp-label">SPEAKING</div>
+    </div>
+    <div id="tech-filter"></div>
     <div id="back-view" style="display:none">← BACK</div>
     <div id="legend"><span class="y"></span> PROJECT <span class="g"></span> SUCCESS <span class="r"></span> FAILURE</div>
     <div id="dev-fps-display">0 FPS</div>
+    <div id="detail-panel">
+        <button class="dp-close" id="dp-close">✕</button>
+        <div class="dp-title" id="dp-title"></div>
+        <div class="dp-subtitle" id="dp-subtitle"></div>
+        <div class="dp-row">
+            <div class="dp-section">
+                <div class="dp-label">Tech</div>
+                <div class="dp-value dp-tech" id="dp-tech"></div>
+            </div>
+            <div class="dp-section">
+                <div class="dp-label">Platform</div>
+                <div class="dp-value" id="dp-platform"></div>
+            </div>
+            <div class="dp-section">
+                <div class="dp-label">Rank</div>
+                <div class="dp-value" id="dp-rank"></div>
+            </div>
+        </div>
+        <div class="dp-section">
+            <div class="dp-label">Status</div>
+            <div class="dp-value" id="dp-status"></div>
+        </div>
+        <div class="dp-section">
+            <div class="dp-label">Description</div>
+            <div class="dp-value" id="dp-desc"></div>
+        </div>
+        <div class="dp-section">
+            <div class="dp-label">Struggles & Fixes</div>
+            <ul class="dp-features" id="dp-features"></ul>
+        </div>
+    </div>
     <div id="dev-btn">DEV</div>
     <div id="dev-panel">
         <div class="dev-title">debug</div>
+        <label><input type="checkbox" id="dev-voice-loop" checked /> Voice loop → TTS</label>
         <label><input type="checkbox" id="dev-hitbox" /> Show hitboxes</label>
+        <label><input type="checkbox" id="dev-hide-3d" checked /> Hide 3D view</label>
         <label><input type="checkbox" id="dev-feat-hitbox" /> Show feature hitboxes</label>
         <label><input type="checkbox" id="dev-laser" /> Raycaster laser</label>
         <label><input type="checkbox" id="dev-followers" /> Follower lines</label>
         <label><input type="checkbox" id="dev-fps" /> FPS counter</label>
+        <hr style="border-color:rgba(0,255,160,0.1);margin:8px 0" />
+        <button id="dev-rescan" style="background:rgba(0,255,160,0.08);border:1px solid rgba(0,255,160,0.2);color:#00ffa0;font-family:monospace;font-size:0.5rem;padding:4px 8px;border-radius:3px;cursor:pointer;width:100%;letter-spacing:1px" onclick="fetch('/api/rescan',{method:'POST'}).then(()=>location.reload())">RESCAN FROM DISK</button>
     </div>
 
 
     <script type="importmap">
         { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
-    </script>
-
-    <script type="module" src="./orchestrator.js"></script>
+    </script>    <script type="module" src="./orchestrator.js"></script>
 </body>
 </html>
