@@ -89,6 +89,7 @@ buildWebLines();
 
 wireInteraction(dgs, dragControls, cls);
 wireSearch(sns);
+window.__searchableNodes = sns;
 wireDev();
 
 function startAutoRotate() { orbitControls.autoRotate = true; }

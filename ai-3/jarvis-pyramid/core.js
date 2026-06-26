@@ -25,7 +25,8 @@ const orbitControls = new OrbitControls(camera, renderer.domElement);
 orbitControls.enableDamping = true;
 orbitControls.dampingFactor = 0.08;
 orbitControls.autoRotate = true;
-orbitControls.autoRotateSpeed = 0.08;
+orbitControls.autoRotateSpeed = 0.2;
+window.__orbitControls = orbitControls;
 
 orbitControls.target.set(0, 10, 0);
 

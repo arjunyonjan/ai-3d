@@ -47,6 +47,7 @@ export function wireDev() {
                 geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
                 const mat = new THREE.LineBasicMaterial({ color: 0x00ffa0, transparent: true, opacity: 0.3, depthWrite: false });
                 laserLine = new THREE.Line(geo, mat);
+                window.__laserLine = laserLine;
                 scene.add(laserLine);
             }
             laserLine.visible = true;
