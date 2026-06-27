@@ -1,0 +1,43 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #0a1410; overflow: hidden;   font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+  color: #c0e8d8;
+}
+#info {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+  font-size: 14px; letter-spacing: 3px; text-transform: uppercase;
+  color: #00ffa0; opacity: 0.5; z-index: 10;
+}
+.glass-panel {
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0,255,160,0.25);
+  border-radius: 6px;
+  padding: 8px 14px;
+  min-width: 160px;
+  text-align: center;
+  box-shadow: 0 0 30px rgba(0,255,160,0.08), inset 0 1px 0 rgba(255,255,255,0.06);
+  user-select: none;
+  pointer-events: none;
+}
+.glass-panel h3 {
+  font-size: 11px; font-weight: 600; color: #00ffa0;
+  margin-bottom: 4px; letter-spacing: 1px;
+}
+.glass-panel p {
+  font-size: 9px; color: #8ab8a8; line-height: 1.4;
+}
+.label-renderer { transform: translateZ(0); will-change: transform; }
+.glass-panel { will-change: transform; }
+.group-label {
+  font-size: 8px; letter-spacing: 3px; font-weight: 600;
+  text-transform: uppercase; opacity: 0.5; text-align: center;
+  border-bottom: 1px solid; padding-bottom: 3px; width: 140px;
+  user-select: none; pointer-events: none;
+}
+.glass-panel .badge {
+  display: inline-block; margin-top: 4px; padding: 1px 6px;
+  border-radius: 8px; font-size: 8px; letter-spacing: 1px;
+  background: rgba(0,255,160,0.1); color: #00ffa0; border: 1px solid rgba(0,255,160,0.2);
+}
