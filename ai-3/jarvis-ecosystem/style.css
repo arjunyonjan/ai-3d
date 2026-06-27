@@ -15,7 +15,7 @@ body {
   border: 1px solid rgba(0,255,160,0.25);
   border-radius: 6px;
   padding: 8px 14px;
-  min-width: 160px;
+  min-width: 130px;
   text-align: center;
   box-shadow: 0 0 30px rgba(0,255,160,0.08), inset 0 1px 0 rgba(255,255,255,0.06);
   user-select: none;
@@ -40,4 +40,15 @@ body {
   display: inline-block; margin-top: 4px; padding: 1px 6px;
   border-radius: 8px; font-size: 8px; letter-spacing: 1px;
   background: rgba(0,255,160,0.1); color: #00ffa0; border: 1px solid rgba(0,255,160,0.2);
+}
+.heart-icon {
+  animation: heart-pulse 1.2s ease-in-out infinite;
+  transform-origin: center;
+}
+@keyframes heart-pulse {
+  0%, 100% { transform: scale(1); }
+  14% { transform: scale(1.2); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.15); }
+  56% { transform: scale(1); }
 }
