@@ -52,3 +52,10 @@ body {
   42% { transform: scale(1.15); }
   56% { transform: scale(1); }
 }
+.core-ring {
+  animation: ring-rotate 4s linear infinite;
+}
+@keyframes ring-rotate {
+  from { transform: translate(-50%,-50%) rotate(0deg); }
+  to { transform: translate(-50%,-50%) rotate(360deg); }
+}

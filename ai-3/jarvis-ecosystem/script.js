@@ -119,7 +119,10 @@
         : '<span style="color:' + c + '">' + n.label + '</span>';
     var env = n.env || '?';
     var envColor = env === 'WSL' ? '#44dd88' : env === 'WIN' ? '#4488ff' : env === 'BOTH' ? '#aa66ff' : '#888';
-    div.innerHTML = '<h3>' + titleHtml + '</h3><p>' + n.detail + '</p><div style="display:flex;gap:4px;justify-content:center;margin-top:4px"><span class="badge" style="color:' + bc + ';border-color:' + bc + '44;background:' + bc + '11">' + n.badge + '</span><span class="badge" style="color:' + envColor + ';border-color:' + envColor + '44;background:' + envColor + '11;font-size:7px">' + env + '</span></div>';
+    var ringSvg = isCore
+      ? '<svg class="core-ring" width="100" height="100" viewBox="0 0 100 100" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none"><circle cx="50" cy="50" r="42" fill="none" stroke="#00ffa0" stroke-width="0.5" opacity="0.4"/><circle cx="50" cy="50" r="38" fill="none" stroke="#00ffa0" stroke-width="0.3" opacity="0.2" stroke-dasharray="4 8"/><circle cx="50" cy="50" r="46" fill="none" stroke="#00ffa0" stroke-width="0.3" opacity="0.2" stroke-dasharray="2 6"/><line x1="8" y1="50" x2="20" y2="50" stroke="#00ffa0" stroke-width="0.6" opacity="0.5"/><line x1="80" y1="50" x2="92" y2="50" stroke="#00ffa0" stroke-width="0.6" opacity="0.5"/><line x1="50" y1="8" x2="50" y2="20" stroke="#00ffa0" stroke-width="0.6" opacity="0.5"/><line x1="50" y1="80" x2="50" y2="92" stroke="#00ffa0" stroke-width="0.6" opacity="0.5"/></svg>'
+      : '';
+    div.innerHTML = ringSvg + '<h3>' + titleHtml + '</h3><p>' + n.detail + '</p><div style="display:flex;gap:4px;justify-content:center;margin-top:4px"><span class="badge" style="color:' + bc + ';border-color:' + bc + '44;background:' + bc + '11">' + n.badge + '</span><span class="badge" style="color:' + envColor + ';border-color:' + envColor + '44;background:' + envColor + '11;font-size:7px">' + env + '</span></div>';
 
     var label = new THREE.CSS2DObject(div);
     var nz = n.z !== undefined ? n.z : 0;
@@ -133,26 +136,6 @@
     scene.add(ghost);
     nodeGhosts[i] = ghost;
   });
-
-  // ── Core Ring HUD ─────────────────────────────────────
-  var coreRings = [];
-  var coreNode = data.nodes.filter(function(n) { return n.id === 'opencode'; })[0];
-  if (coreNode) {
-    var cPos = new THREE.Vector3(coreNode.x, coreNode.y, coreNode.z || 0);
-    var ringMat = new THREE.MeshBasicMaterial({
-      color: 0x00ffa0, transparent: true, opacity: 0.2, side: THREE.DoubleSide,
-      depthWrite: false
-    });
-    for (var ri = 0; ri < 3; ri++) {
-      var ring = new THREE.Mesh(new THREE.TorusGeometry(0.8 + ri * 0.35, 0.008, 8, 24), ringMat);
-      ring.position.copy(cPos);
-      ring.rotation.x = Math.PI / 2 + ri * 0.3;
-      ring.rotation.y = ri * 0.5;
-      ring.userData = { ri: ri, phase: ri * 1.2 };
-      scene.add(ring);
-      coreRings.push(ring);
-    }
-  }
 
   // ── Connections (same-group lines) ────────────────────
   var connections = [];
@@ -329,12 +312,6 @@
       var pulse = 0.85 + Math.sin(t * 1.2) * 0.15;
       coreGhost.scale.setScalar(pulse);
     }
-
-    // Core ring HUD rotation
-    coreRings.forEach(function(ring) {
-      ring.rotation.z = t * 0.3 + ring.userData.phase;
-      ring.material.opacity = 0.15 + Math.sin(t * 0.6 + ring.userData.phase) * 0.1;
-    });
 
     // Animate cross-line dots
     crossLines.forEach(function(xl, i) {
