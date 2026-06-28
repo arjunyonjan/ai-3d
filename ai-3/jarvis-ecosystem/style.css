@@ -35,7 +35,14 @@ body {
   font-size: 8px; letter-spacing: 3px; font-weight: 600;
   text-transform: uppercase; opacity: 0.5; text-align: center;
   border-bottom: 1px solid; padding-bottom: 3px; width: 140px;
-  user-select: none; pointer-events: none;
+  user-select: none;
+}
+.group-label .collapse-arrow {
+  opacity: 0.7;
+  filter: drop-shadow(0 0 3px currentColor);
+}
+.group-label:hover .collapse-arrow {
+  opacity: 1;
 }
 .glass-panel .badge {
   display: inline-block; margin-top: 4px; padding: 1px 6px;
@@ -53,10 +60,27 @@ body {
   42% { transform: scale(1.15); }
   56% { transform: scale(1); }
 }
-.core-ring {
-  animation: ring-rotate 4s linear infinite;
+@keyframes ring-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
-@keyframes ring-rotate {
-  from { transform: translate(-50%,-50%) rotate(0deg); }
-  to { transform: translate(-50%,-50%) rotate(360deg); }
+@keyframes ring-spin-rev {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
 }
+.core-ring-wrap {
+  filter: drop-shadow(0 0 6px rgba(255,51,85,0.3)) drop-shadow(0 0 12px rgba(51,136,255,0.2)) drop-shadow(0 0 18px rgba(51,255,136,0.15));
+  animation: glow-breathe 3s ease-in-out infinite;
+}
+@keyframes glow-breathe {
+  0%, 100% { opacity: 0.6; filter: drop-shadow(0 0 4px rgba(255,51,85,0.25)) drop-shadow(0 0 8px rgba(51,136,255,0.15)) drop-shadow(0 0 12px rgba(51,255,136,0.1)); }
+  50% { opacity: 1; filter: drop-shadow(0 0 10px rgba(255,51,85,0.5)) drop-shadow(0 0 20px rgba(51,136,255,0.35)) drop-shadow(0 0 30px rgba(51,255,136,0.25)); }
+}
+
+.cr-r1 { filter: drop-shadow(0 0 4px #ff3355); }
+.cr-r2 { filter: drop-shadow(0 0 4px #3388ff); }
+.cr-r3 { filter: drop-shadow(0 0 4px #33ff88); }
+.cr-r4 { filter: drop-shadow(0 0 4px #ff33cc); }
+.cr-cross { filter: drop-shadow(0 0 3px #33ddff); }
+.cr-scan { filter: drop-shadow(0 0 6px #ff6633); }
+.cr-scan-rev { filter: drop-shadow(0 0 6px #7733ff); }

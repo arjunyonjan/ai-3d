@@ -3,16 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fuche AI Ecosystem</title>
+<title>Fuche Jarvis AI Ecosystem</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div id="info">Fuche AI Ecosystem</div>
+<div id="info">Fuche Jarvis AI Ecosystem</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="data.js"></script>
-<script src="script.js"></script>
+<script src="setup.js"></script>
+<script src="materials.js"></script>
+<script src="nodes.js"></script>
+<script src="connections.js"></script>
+<script src="particles.js"></script>
+<script src="interaction.js"></script>
+<script src="animate.js"></script>
 <script>
 new EventSource('/events').addEventListener('reload', function(){ location.reload(); });
 </script>

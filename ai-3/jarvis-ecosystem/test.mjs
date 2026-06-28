@@ -1,0 +1,12 @@
+import { chromium } from 'playwright';
+const browser = await chromium.launch();
+const page = await browser.newPage();
+await page.goto('http://localhost:8081');
+await page.waitForSelector('canvas', { timeout: 5000 });
+const canvas = await page.$('canvas');
+console.log('Canvas found:', !!canvas);
+const title = await page.title();
+console.log('Title:', title);
+const body = await page.evaluate(() => document.body.innerHTML.length);
+console.log('Body HTML length:', body);
+await browser.close();
